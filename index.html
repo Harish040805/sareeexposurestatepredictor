@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saree Exposure State Predictor</title>
+    <style>
+        :root { --dark: #ff64c6; --medium: #ff41b9; --mediumplus: #ff25af; }
+        body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navelii.jpg?raw=true'); background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 27px; display: flex; justify-content: center; }
+        .container { max-width: 700px; margin: 0 auto; background: #ffffff43; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(219, 112, 147, 0.15); border: 1px solid #ffe0e6; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        h2, h3 { color: var(--medium); margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--dark); }
+        select, input { width: 100%; padding: 10px; border: 1px solid #ffb6c1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        select:focus, input:focus { outline: none; border-color: var(--medium); box-shadow: 0 0 5px rgba(219, 112, 147, 0.3); }
+        button { width: 100%; background-color: var(--medium); color: white; border: none; padding: 10px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: var(--mediumplus); }
+        .results-panel { margin-top: 25px; padding: 15px; background-color: #fff0f3; border-left: 5px solid var(--medium); border-radius: 4px; }
+        .meta-info { font-size: 12px; color: #777; margin-bottom: 15px; text-align: right; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; background: #fff; }
+        th, td { border: 1px solid #ffe0e6; padding: 10px; text-align: left; }
+        th { background-color: var(--medium); color: white; }
+        .lady-img{ width: 285px; height: 257px; align-content: center; display: block; margin: 0 auto; border: 1px solid #ffb6c1; border-radius: 30px; }
+    </style>
+</head>
+<body>
+<div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
+    <h2>🦋 Saree Exposure State Predictor 🌷</h2>
+    <img src="https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true" class="lady-img">
+    <br>
+    <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Adjust parameters to run a high-speed mathematical state simulation (100,000 randomized dynamic samples).</p>
+    <br>
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="drapeStyle">Draping Style:</label>
+            <select id="drapeStyle">
+                <option value="Nivi">Nivi (Standard / Traditional)</option>
+                <option value="Low-Hip Contemporary">Low-Hip Contemporary</option>
+                <option value="Bengali / Traditional">Bengali / Traditional</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="activityLevel">Activity Level Factor:</label>
+            <select id="activityLevel">
+                <option value="1.0">Static (Standing / Sitting)</option>
+                <option value="1.8">Moderate (Normal Walking)</option>
+                <option value="3.0">Dynamic (Active Dancing / Movement)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="transparency">Fabric Transparency Factor <br>(0.0 = Opaque, 1.0 = Fully Sheer):</label>
+            <input type="number" id="transparency" min="0" max="1" step="0.1" value="0.0">
+        </div>
+        <div class="form-group">
+            <label for="pleatWidth">Pleat Folding Width Factor <br>(in inches):</label>
+            <input type="number" id="pleatWidth" min="2" max="6" step="0.5" value="5.0">
+        </div>
+    </div>
+</div>
+<div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-top: 0; padding-bottom: 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; margin-top: 0;">
+        <h2 style="margin-top: 20px; font-size: 20px;">💋 Primary Exposure 🔞
+            <br>
+            <span style="color: #ffffff00;">_____</span>Categorization
+        </h2>
+        <div class="meta-info" id="metaInfo" style="margin: 0;">
+            Results appear here
+            <span style="color: #ffffff0f;">oo</span>
+            <br>
+            <span style="color: #ffffff0f;">oo</span>
+        </div>
+    </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Anatomical Navel State</th>
+                    <th>Probability Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Completely Exposed</td><td id="resComplete">--</td></tr>
+                <tr><td>Partially Exposed</td><td id="resPartial">--</td></tr>
+                <tr><td>Not Exposed</td><td id="resNot">--</td></tr>
+            </tbody>
+        </table>
+        <br>
+        <h3>💞 Sub-Case Regional Matrices</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Structural Combination Condition</th>
+                    <th>Probability Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Hip Exposed AND Navel Exposed</td><td id="subBothExposed">--</td></tr>
+                <tr><td>Hip Exposed BUT Navel Not Exposed</td><td id="subHipOnly">--</td></tr>
+                <tr><td>Both Hip and Navel Hidden</td><td id="subBothHidden">--</td></tr>
+            </tbody>
+        </table>
+        <br>
+    <button onclick="executeSimulation()">▶️ &nbsp; Run Simulation Engine</button>
+    <br>
+    </div>
+</div>
+<script>
+if (!confirm("🔞 To enter the site, you should be above 18 years of age. If not return back!")) {
+    window.history.back();
+}
+class SareeExposureSimulator {
+    constructor() {
+        this.styles = {
+            "Nivi": { avgWaistHeightCm: -2, palluCoverageAvg: 0.65, variance: 3 },
+            "Low-Hip Contemporary": { avgWaistHeightCm: -7, palluCoverageAvg: 0.30, variance: 2 },
+            "Bengali / Traditional": { avgWaistHeightCm: 3, palluCoverageAvg: 0.95, variance: 1.5 }
+        };
+    }
+    runSimulation(drapeStyle, fabricTransparency = 0.0, activityMultiplier = 1.0, pleatWidth = 5.0, iterations = 100000) {
+        const config = this.styles[drapeStyle] || this.styles["Nivi"];
+        let counters = {
+            completely_exposed: 0,
+            partially_exposed: 0,
+            not_exposed: 0,
+            hip_and_navel_exposed: 0,
+            hip_exposed_navel_hidden: 0,
+            both_hidden: 0
+        };
+        const startTime = performance.now();
+        for (let i = 0; i < iterations; i++) {
+            const movementFactor = (Math.random() - 0.5) * config.variance * 2 * activityMultiplier;
+            const currentWaistLine = config.avgWaistHeightCm + movementFactor;
+            const pleatReductionFactor = Math.max(0.5, Math.min(1.5, pleatWidth / 5.0));
+            const currentPalluCoverage = Math.max(0, Math.min(1, (config.palluCoverageAvg * pleatReductionFactor) + (Math.random() - 0.5) * 0.2));
+            const navelTop = 1.5;
+            const navelBottom = -1.5;
+            let navelExposurePercent = 0;
+            let hipExposed = (currentWaistLine < 0);
+            if (currentWaistLine <= navelBottom) {
+                navelExposurePercent = 1.0; 
+            } else if (currentWaistLine >= navelTop) {
+                navelExposurePercent = 0.0; 
+            } else {
+                navelExposurePercent = (navelTop - currentWaistLine) / (navelTop - navelBottom);
+            }
+            let finalNavelVisibility = navelExposurePercent * (1 - currentPalluCoverage);
+            if (fabricTransparency > 0) {
+                finalNavelVisibility = Math.max(finalNavelVisibility, navelExposurePercent * fabricTransparency * (1 - currentPalluCoverage));
+            }
+            let finalHipVisibility = hipExposed ? (1 - currentPalluCoverage) : 0;
+            if (fabricTransparency > 0 && hipExposed) {
+                finalHipVisibility = Math.max(finalHipVisibility, fabricTransparency);
+            }
+            if (finalNavelVisibility > 0.85) {
+                counters.completely_exposed++;
+            } else if (finalNavelVisibility > 0.10) {
+                counters.partially_exposed++;
+            } else {
+                counters.not_exposed++;
+            }
+            const isHipVisibleState = finalHipVisibility > 0.10;
+            const isNavelVisibleState = finalNavelVisibility > 0.10;
+            if (isHipVisibleState && isNavelVisibleState) {
+                counters.hip_and_navel_exposed++;
+            } else if (isHipVisibleState && !isNavelVisibleState) {
+                counters.hip_exposed_navel_hidden++;
+            } else if (!isHipVisibleState && !isNavelVisibleState) {
+                counters.both_hidden++;
+            } else {
+                counters.completely_exposed++;
+            }
+        }
+        const endTime = performance.now();
+        return {
+            executionTimeMs: (endTime - startTime).toFixed(2),
+            totalSamples: iterations,
+            results: {
+                complete: ((counters.completely_exposed / iterations) * 100).toFixed(2) + "%",
+                partial: ((counters.partially_exposed / iterations) * 100).toFixed(2) + "%",
+                notExposed: ((counters.not_exposed / iterations) * 100).toFixed(2) + "%"
+            },
+            subCases: {
+                bothExposed: ((counters.hip_and_navel_exposed / iterations) * 100).toFixed(2) + "%",
+                hipOnly: ((counters.hip_exposed_navel_hidden / iterations) * 100).toFixed(2) + "%",
+                bothHidden: ((counters.both_hidden / iterations) * 100).toFixed(2) + "%"
+            }
+        };
+    }
+}
+const engine = new SareeExposureSimulator();
+function executeSimulation() {
+    const drapeStyle = document.getElementById("drapeStyle").value;
+    const transparency = parseFloat(document.getElementById("transparency").value) || 0.0;
+    const activity = parseFloat(document.getElementById("activityLevel").value) || 1.0;
+    const pleats = parseFloat(document.getElementById("pleatWidth").value) || 5.0;
+    const data = engine.runSimulation(drapeStyle, transparency, activity, pleats);
+    document.getElementById("metaInfo").innerText = `Execution Time: ${data.executionTimeMs} ms \n Total Samples Evaluated: ${data.totalSamples.toLocaleString()}`;
+    document.getElementById("resComplete").innerText = data.results.complete;
+    document.getElementById("resPartial").innerText = data.results.partial;
+    document.getElementById("resNot").innerText = data.results.notExposed;
+    document.getElementById("subBothExposed").innerText = data.subCases.bothExposed;
+    document.getElementById("subHipOnly").innerText = data.subCases.hipOnly;
+    document.getElementById("subBothHidden").innerText = data.subCases.bothHidden;
+}
+</script>
+</body>
+</html>
