@@ -166,9 +166,7 @@ class SareeExposureSimulator {
                 counters.hip_exposed_navel_hidden++;
             } else if (!isHipVisibleState && !isNavelVisibleState) {
                 counters.both_hidden++;
-            } else {
-                counters.completely_exposed++;
-            }
+            } 
         }
         const endTime = performance.now();
         return {
