@@ -27,15 +27,15 @@
 <body>
 <div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
     <h2>🦋 Saree Exposure State Predictor 🌷</h2>
-    <img src="https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true" class="lady-img">
+    <img src="https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true" class="lady-img" id="displayImage">
     <br>
     <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Adjust parameters to run a high-speed mathematical state simulation (100,000 randomized dynamic samples).</p>
     <br>
     <div class="form-grid">
         <div class="form-group">
             <label for="drapeStyle">Draping Style:</label>
-            <select id="drapeStyle">
-                <option value="Nivi">Nivi (Standard / Traditional)</option>
+            <select id="drapeStyle" onchange="updateImage()">
+                <option value="Nivi">Nivi (Standard / Traditional)</option>                
                 <option value="Low-Hip Contemporary">Low-Hip Contemporary</option>
                 <option value="Bengali / Traditional">Bengali / Traditional</option>
             </select>
@@ -111,9 +111,9 @@ if (!confirm("🔞 To enter the site, you should be above 18 years of age. If no
 class SareeExposureSimulator {
     constructor() {
         this.styles = {
-            "Nivi": { avgWaistHeightCm: -2, palluCoverageAvg: 0.65, variance: 3 },
-            "Low-Hip Contemporary": { avgWaistHeightCm: -7, palluCoverageAvg: 0.30, variance: 2 },
-            "Bengali / Traditional": { avgWaistHeightCm: 3, palluCoverageAvg: 0.95, variance: 1.5 }
+            "Nivi": { avgWaistHeightCm: 1.0, palluCoverageAvg: 0.75, variance: 1.5 },
+            "Low-Hip Contemporary": { avgWaistHeightCm: -7.0, palluCoverageAvg: 0.30, variance: 2.0 },
+            "Bengali / Traditional": { avgWaistHeightCm: 1.0, palluCoverageAvg: 1.3, variance: 0.5 }
         };
     }
     runSimulation(drapeStyle, fabricTransparency = 0.0, activityMultiplier = 1.0, pleatWidth = 5.0, iterations = 100000) {
@@ -188,6 +188,17 @@ class SareeExposureSimulator {
     }
 }
 const engine = new SareeExposureSimulator();
+function updateImage() {
+    const drapeStyle = document.getElementById("drapeStyle").value;
+    const imgElement = document.getElementById("displayImage");
+    if (drapeStyle === "Nivi") {
+        imgElement.src = "image1.jpg";
+    } else if (drapeStyle === "Bengali / Traditional") {
+        imgElement.src = "image3.jpg";
+    } else {
+        imgElement.src = "https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true";
+    }
+}
 function executeSimulation() {
     const drapeStyle = document.getElementById("drapeStyle").value;
     const transparency = parseFloat(document.getElementById("transparency").value) || 0.0;
