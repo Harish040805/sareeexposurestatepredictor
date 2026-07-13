@@ -151,22 +151,24 @@ class SareeExposureSimulator {
             if (fabricTransparency > 0 && hipExposed) {
                 finalHipVisibility = Math.max(finalHipVisibility, fabricTransparency);
             }
-            if (finalNavelVisibility > 0.85) {
+            if (finalNavelVisibility >= 0.85) {
                 counters.completely_exposed++;
-            } else if (finalNavelVisibility > 0.10) {
+            } else if (finalNavelVisibility >= 0.10) {
                 counters.partially_exposed++;
             } else {
                 counters.not_exposed++;
             }
-            const isHipVisibleState = finalHipVisibility > 0.10;
-            const isNavelVisibleState = finalNavelVisibility > 0.10;
+            const isHipVisibleState = finalHipVisibility >= 0.10;
+            const isNavelVisibleState = finalNavelVisibility >= 0.10;
             if (isHipVisibleState && isNavelVisibleState) {
-                counters.hip_and_navel_exposed++;
+              counters.hip_and_navel_exposed++;
             } else if (isHipVisibleState && !isNavelVisibleState) {
-                counters.hip_exposed_navel_hidden++;
-            } else if (!isHipVisibleState && !isNavelVisibleState) {
-                counters.both_hidden++;
-            } 
+              counters.hip_exposed_navel_hidden++;
+            } else if (!isHipVisibleState && isNavelVisibleState) {
+              counters.completely_exposed++;
+            } else {
+              counters.both_hidden++;
+            }
         }
         const endTime = performance.now();
         return {
