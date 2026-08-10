@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saree Exposure State Predictor</title>
-    <link rel="icon" type="image/x-icon" href="naviv.jpg">
+    <link rel="icon" type="image/x-icon" href="naviv.jpg" class="favclass">
     <style>
         :root { --dark: #ff64c6; --medium: #ff41b9; --mediumplus: #ff25af; }
         body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 27px; display: flex; justify-content: center; }
@@ -23,9 +23,10 @@
         th, td { border: 1px solid #ffe0e6; padding: 10px; text-align: left; }
         th { background-color: var(--medium); color: white; }
         .lady-img{ width: 285px; height: 257px; align-content: center; display: block; margin: 0 auto; border: 1px solid #ffb6c1; border-radius: 30px; }
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
         #splash-img { max-width: 70%; max-height: 70%; object-fit: contain; border-radius: 1000px; }
         #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .favclass { border-radius: 200px; }
     </style>
 </head>
 <body>
