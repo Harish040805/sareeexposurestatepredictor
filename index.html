@@ -22,9 +22,15 @@
         th, td { border: 1px solid #ffe0e6; padding: 10px; text-align: left; }
         th { background-color: var(--medium); color: white; }
         .lady-img{ width: 285px; height: 257px; align-content: center; display: block; margin: 0 auto; border: 1px solid #ffb6c1; border-radius: 30px; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
+        #splash-img { max-width: 80%; max-height: 80%; object-fit: contain; }
+        #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     </style>
 </head>
 <body>
+<div id="splash-screen">
+  <img src="naviv.jpg" id="splash-img">
+</div>
 <div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
     <h2>🦋 Saree Exposure State Predictor 🌷</h2>
     <img src="naveli.jpg" class="lady-img" id="displayImage">
@@ -108,6 +114,15 @@
 if (!confirm("🔞 To enter the site, you should be above 18 years of age. If not return back!")) {
     window.history.back();
 }
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash-screen');
+    splash.classList.add('hidden');
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 500);
+  }, 5000);
+});
 class SareeExposureSimulator {
     constructor() {
         this.styles = {
