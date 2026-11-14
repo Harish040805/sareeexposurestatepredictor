@@ -29,7 +29,6 @@
         #splash-img { max-width: 70%; max-height: 70%; object-fit: contain; border-radius: 1000px; }
         #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .favclass { border-radius: 200px; }
-        /* ---- Cleavage section additions ---- */
         .clv-placeholder { width: 285px; height: 257px; margin: 0 auto; border: 1px dashed #ffb6c1; border-radius: 30px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 13px; color: #a05070; padding: 15px; box-sizing: border-box; }
         @media (max-width: 900px) { .row { flex-direction: column; align-items: center; gap: 25px; } .container { width: 100%; box-sizing: border-box; } .form-grid { grid-template-columns: 1fr; } }
     </style>
@@ -40,10 +39,7 @@
     <br>
   <h2>🦋 Saree Exposure State Predictor 🌷</h2>
 </div>
-
 <div class="page">
-
-<!-- ===================== NAVEL PREDICTOR (existing) ===================== -->
 <div class="row">
 <div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
     <h2>🦋 Navel Exposure State Predictor 🌷</h2>
@@ -126,8 +122,6 @@
     <br>
 </div>
 </div>
-
-<!-- ===================== CLEAVAGE PREDICTOR ===================== -->
 <div class="row">
 <div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
     <h2>🦋 Cleavage Exposure State Predictor 🌷</h2>
@@ -146,10 +140,11 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="clvAction">Body Action / Posture:</label>
+            <label for="clvAction">Activity Level Factor:</label>
             <select id="clvAction">
-                <option value="standing">Standing (upright)</option>
-                <option value="sitting">Sitting (relaxed, slight lean)</option>
+                <option value="standing">Static (Standing / Normal Walking)</option>
+                <option value="sitting">Moderate (Sitting / Slight Lean)</option>
+                <option value="dancing">Dynamic (Active Dancing / Movement)</option>
                 <option value="bending">Bending / Bowing Down (15°–90° forward bend)</option>
             </select>
         </div>
@@ -232,8 +227,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 500);
   }, 5000);
 });
-
-/* ================= Shared random / math helpers ================= */
 const MathKit = {
     createRng(seed) {
         let a = seed >>> 0;
@@ -258,8 +251,6 @@ const MathKit = {
         return mean + z * sd;
     }
 };
-
-/* ================= NAVEL / HIP SIMULATOR ================= */
 class SareeExposureSimulator {
     constructor() {
         this.navelRadius = 1.0;
@@ -273,14 +264,13 @@ class SareeExposureSimulator {
             "Low-Hip Contemporary": { edgeMean: -6.0, edgeSd: 2.0, moveSd: 0.6, hemMean: 8.0, hemSd: 3.0, pallu: [0.60, 0.30, 0.10] },
             "Bengali / Traditional": { edgeMean: 0.5, edgeSd: 1.2, moveSd: 0.3, hemMean: 8.0, hemSd: 3.0, pallu: [0.15, 0.30, 0.55] }
         };
-        /* Bending / bowing-down scenario (tunable assumptions) */
         this.bend = {
-            meanAngle: 55, sdAngle: 20, minAngle: 15, maxAngle: 90, // forward torso bend, degrees
-            moveMult: 1.5,      // waist-edge jitter multiplier while bending
-            edgeDrop: 1.0,      // inches the saree waist edge sags at a full 90° bend
-            navelFold: 0.35,    // max fraction of navel hidden by the abdominal skin fold at 90°
-            disturbBase: 0.12,  // pallu slip probability at 0° bend
-            disturbSlope: 0.25, // added slip probability at 90° bend
+            meanAngle: 55, sdAngle: 20, minAngle: 15, maxAngle: 90,
+            moveMult: 1.5,
+            edgeDrop: 1.0,
+            navelFold: 0.35,
+            disturbBase: 0.12,
+            disturbSlope: 0.25,
             disturbMax: 0.40
         };
     }
@@ -295,7 +285,6 @@ class SareeExposureSimulator {
     layered(D, c, tau) {
         return D * (1 - c + c * tau) + (1 - D) * (tau * (1 - c) + c * tau * tau);
     }
-    // activityMultiplier: a number (1.0–3.0) OR the string "bend"
     runSimulation(drapeStyle, fabricTransparency = 0.0, activityMultiplier = 1.0, pleatWidth = 5.0, iterations = 100000) {
         const config = this.styles[drapeStyle] || this.styles["Nivi"];
         const isBend = activityMultiplier === "bend";
@@ -318,7 +307,7 @@ class SareeExposureSimulator {
             const baseIdx = r0 < config.pallu[0] ? 0 : (r0 < config.pallu[0] + config.pallu[1] ? 1 : 2);
             const partialCover = 0.3 + 0.4 * rng();
             for (let m = 0; m < moments; m++) {
-                let b = 0; // normalized bend (0 = upright, 1 = 90°)
+                let b = 0;
                 if (isBend) {
                     const ang = this.clamp(this.truncNormal(rng, bd.meanAngle, bd.sdAngle), bd.minAngle, bd.maxAngle);
                     angleSum += ang;
@@ -377,50 +366,37 @@ class SareeExposureSimulator {
         };
     }
 }
-
-/* ================= CLEAVAGE SIMULATOR ================= */
-/*
-  Geometry: depths are inches measured DOWN from the shoulder line.
-  The "cleavage zone" spans zoneTop → zoneBottom (4 in). A blouse neckline that
-  sits at depth N reveals the fraction clamp((N - zoneTop)/(zoneBottom - zoneTop), 0, 1) of it.
-  Leaning forward (sitting = slight, bending = deep) deepens the effective neckline
-  (blouse gape) in proportion to lean angle and blouse fit.
-  The chest pallu (open / partial / full) then hides part of whatever is revealed.
-*/
 class CleavageSimulator {
     constructor() {
         this.persons = 2000;
         this.seeThrough = 0.5;
         this.zoneTop = 3.5;
         this.zoneBottom = 7.5;
-        this.thresholds = { mostly: 0.60, slightly: 0.10 }; // visible fraction of the zone
+        this.thresholds = { mostly: 0.60, slightly: 0.10 };
         this.necklines = {
             "Shallow": { mean: 4.5, sd: 1.0 },
             "Medium":  { mean: 6.5, sd: 1.2 },
             "Deep":    { mean: 9.0, sd: 1.5 }
         };
-        // gape = extra effective neckline depth (in) at a full 90° lean; moveSd = neckline jitter (in)
         this.fits = {
             "Snug":     { gape: 0.6, moveSd: 0.15 },
             "Standard": { gape: 1.5, moveSd: 0.25 },
             "Loose":    { gape: 3.0, moveSd: 0.40 }
         };
-        // base = pallu slip probability when upright; bendAdd = extra slip probability at 90° lean
         this.pinning = {
             "Pinned":   { base: 0.02, bendAdd: 0.20 },
             "Standard": { base: 0.08, bendAdd: 0.45 },
             "Loose":    { base: 0.20, bendAdd: 0.65 }
         };
-        // chest-pallu state distribution [open, partial, full] per draping style
         this.palluChest = {
             "Nivi":                 [0.25, 0.50, 0.25],
             "Low-Hip Contemporary": [0.35, 0.45, 0.20],
             "Bengali / Traditional":[0.10, 0.30, 0.60]
         };
-        // body actions: standing = upright; sitting = mild forward lean; bending = deep forward bend
         this.postures = {
-            "standing": { lean: false, moveMult: 1.0 },
+            "standing": { lean: false, act: 1.0 },
             "sitting":  { lean: true, meanAngle: 10, sdAngle: 8,  minAngle: 0,  maxAngle: 30, moveMult: 0.6 },
+            "dancing":  { lean: false, act: 3.0 },
             "bending":  { lean: true, meanAngle: 55, sdAngle: 20, minAngle: 15, maxAngle: 90, moveMult: 1.5 }
         };
         this.slipMax = 0.95;
@@ -433,6 +409,7 @@ class CleavageSimulator {
         const pin = this.pinning[pinKey] || this.pinning["Standard"];
         const palluDist = this.palluChest[drapeStyle] || this.palluChest["Nivi"];
         const T = K.clamp(fabricTransparency, 0, 1) * this.seeThrough;
+        const moveMult = ps.lean ? ps.moveMult : ps.act;
         const zoneLen = this.zoneBottom - this.zoneTop;
         const moments = Math.max(1, Math.round(iterations / this.persons));
         const total = this.persons * moments;
@@ -447,30 +424,27 @@ class CleavageSimulator {
             const baseIdx = r0 < palluDist[0] ? 0 : (r0 < palluDist[0] + palluDist[1] ? 1 : 2);
             const partialCover = 0.35 + 0.35 * rng();
             for (let m = 0; m < moments; m++) {
-                let b = 0; // normalized forward lean (0 = upright, 1 = 90°)
+                let b = 0;
                 if (ps.lean) {
                     const ang = K.clamp(K.truncNormal(rng, ps.meanAngle, ps.sdAngle), ps.minAngle, ps.maxAngle);
                     angleSum += ang;
                     b = ang / 90;
                 }
-                const neckEff = neckBase + K.truncNormal(rng, 0, fit.moveSd * ps.moveMult) + fit.gape * b;
+                const neckEff = neckBase + K.truncNormal(rng, 0, fit.moveSd * moveMult) + fit.gape * b;
                 const reveal = K.clamp((neckEff - this.zoneTop) / zoneLen, 0, 1);
 
                 let idx = baseIdx;
                 if (ps.lean) {
                     const pDist = Math.min(this.slipMax, pin.base + pin.bendAdd * b);
                     if (idx > 0 && rng() < pDist) idx--;
-                    // deep leans can drop the pallu completely
                     if (idx > 0 && b > 0.6 && rng() < pDist * 0.5) idx--;
                 } else {
-                    const pDist = Math.min(0.7, pin.base);
+                    const pDist = Math.min(0.7, pin.base * ps.act);
                     if (idx > 0 && rng() < pDist) idx--;
                 }
                 pal[idx]++;
                 const cover = idx === 0 ? 0 : (idx === 1 ? partialCover : 1);
-                // pallu hides (1 - T) of what it covers; T = sheer leak-through
                 const vis = reveal * (1 - cover * (1 - T));
-
                 if (vis >= this.thresholds.mostly) c.mostly++;
                 else if (vis >= this.thresholds.slightly) c.slightly++;
                 else c.not++;
@@ -484,7 +458,6 @@ class CleavageSimulator {
             avgLeanAngle: ps.lean ? (angleSum / total) : null,
             primaryTotal: c.mostly + c.slightly + c.not,
             counts: c,
-            // expected exposure level on a 0 (never) – 1 (always mostly) scale; used to choose the picture
             exposureScore: (c.mostly + 0.5 * c.slightly) / total,
             results: { mostly: pct(c.mostly), slightly: pct(c.slightly), notExposed: pct(c.not) },
             pallu: { open: pct(pal[0]), partial: pct(pal[1]), full: pct(pal[2]) }
@@ -494,15 +467,12 @@ class CleavageSimulator {
 
 const engine = new SareeExposureSimulator();
 const clvEngine = new CleavageSimulator();
-
-/* ---- Put your 3 cleavage image file names here ---- */
 const CLEAVAGE_IMAGES = {
     mostly: "cleavage_mostly.jpeg",
     slightly: "cleavage_slightly.jpeg",
     not: "cleavage_not.jpeg"
 };
-/* Picture follows the Blouse Neckline Depth option only:
-   Shallow -> "not" image, Medium -> "slightly" image, Deep -> "mostly" image. */
+
 const NECKLINE_IMAGE_KEY = { "Shallow": "not", "Medium": "slightly", "Deep": "mostly" };
 
 function readActivity() {
@@ -567,7 +537,6 @@ function runCleavageModel() {
     return { data };
 }
 
-// Swaps the picture when the neckline option changes (same behaviour as the Draping Style image)
 function updateCleavageImage() {
     const key = NECKLINE_IMAGE_KEY[document.getElementById("necklineDepth").value] || "slightly";
     clvCurrentKey = key;
@@ -590,8 +559,6 @@ function executeCleavageSimulation() {
     document.getElementById("subPalluPartial").innerText = data.pallu.partial;
     document.getElementById("subPalluFull").innerText = data.pallu.full;
 }
-
-// Picture changes only with the neckline option
 document.getElementById("necklineDepth").addEventListener("change", updateCleavageImage);
 updateCleavageImage();
 </script>
