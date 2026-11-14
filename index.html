@@ -106,13 +106,13 @@
             <tbody>
                 <tr><td>Hip Exposed AND Navel Exposed</td><td id="subBothExposed">--</td></tr>
                 <tr><td>Hip Exposed BUT Navel Not Exposed</td><td id="subHipOnly">--</td></tr>
+                <tr><td>Navel Exposed BUT Hip Not Exposed</td><td id="subNavelOnly">--</td></tr>
                 <tr><td>Both Hip and Navel Hidden</td><td id="subBothHidden">--</td></tr>
             </tbody>
         </table>
         <br>
     <button onclick="executeSimulation()">▶️ &nbsp; Run Simulation Engine</button>
     <br>
-    </div>
 </div>
 <script>
 if (!confirm("🔞 To enter the site, you should be above 18 years of age. If not return back!")) {
@@ -132,76 +132,88 @@ class SareeExposureSimulator {
         this.styles = {
             "Nivi": { avgWaistHeightCm: 1.0, palluCoverageAvg: 0.75, variance: 1.5 },
             "Low-Hip Contemporary": { avgWaistHeightCm: -7.0, palluCoverageAvg: 0.30, variance: 2.0 },
-            "Bengali / Traditional": { avgWaistHeightCm: 1.0, palluCoverageAvg: 1.3, variance: 0.5 }
+            "Bengali / Traditional": { avgWaistHeightCm: 1.0, palluCoverageAvg: 0.95, variance: 0.5 }
         };
+        this.navelTop = 1.5;
+        this.navelBottom = -1.5;
+        this.hipLevel = -5.0;
+        this.pleatShiftPerInch = 0.3;
+    }
+    createRng(seed) {
+        let a = seed >>> 0;
+        return function () {
+            a = (a + 0x6D2B79F5) >>> 0;
+            let t = a;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+    clamp(x, lo, hi) {
+        return Math.max(lo, Math.min(hi, x));
     }
     runSimulation(drapeStyle, fabricTransparency = 0.0, activityMultiplier = 1.0, pleatWidth = 5.0, iterations = 100000) {
         const config = this.styles[drapeStyle] || this.styles["Nivi"];
-        let counters = {
-            completely_exposed: 0,
-            partially_exposed: 0,
-            not_exposed: 0,
-            hip_and_navel_exposed: 0,
-            hip_exposed_navel_hidden: 0,
-            both_hidden: 0
+        const T = this.clamp(fabricTransparency, 0, 1);
+        const pleats = this.clamp(pleatWidth, 2, 6);
+        const rng = this.createRng(12345);
+        const pleatShift = (pleats - 5.0) * this.pleatShiftPerInch;
+        const c = {
+            complete: 0,
+            partial: 0,
+            not: 0,
+            both: 0,
+            hipOnly: 0,
+            navelOnly: 0,
+            bothHidden: 0
         };
         const startTime = performance.now();
         for (let i = 0; i < iterations; i++) {
-            const movementFactor = (Math.random() - 0.5) * config.variance * 2 * activityMultiplier;
-            const currentWaistLine = config.avgWaistHeightCm + movementFactor;
-            const pleatReductionFactor = Math.max(0.5, Math.min(1.5, pleatWidth / 5.0));
-            const currentPalluCoverage = Math.max(0, Math.min(1, (config.palluCoverageAvg * pleatReductionFactor) + (Math.random() - 0.5) * 0.2));
-            const navelTop = 1.5;
-            const navelBottom = -1.5;
-            let navelExposurePercent = 0;
-            let hipExposed = (currentWaistLine < 0);
-            if (currentWaistLine <= navelBottom) {
-                navelExposurePercent = 1.0; 
-            } else if (currentWaistLine >= navelTop) {
-                navelExposurePercent = 0.0; 
+            const movementFactor = (rng() - 0.5) * config.variance * 2 * activityMultiplier;
+            const waistLine = config.avgWaistHeightCm + movementFactor + pleatShift;
+            const P = this.clamp(config.palluCoverageAvg + (rng() - 0.5) * 0.2, 0, 1);
+            const E = this.clamp((this.navelTop - waistLine) / (this.navelTop - this.navelBottom), 0, 1);
+            const hipExposed = waistLine < this.hipLevel;
+            const navelDirect = E * (1 - P);
+            const navelVis = navelDirect + (1 - navelDirect) * T;
+            const hipDirect = hipExposed ? (1 - P) : 0;
+            const hipVis = hipDirect + (1 - hipDirect) * T;
+            if (navelVis >= 0.85) {
+                c.complete++;
+            } else if (navelVis >= 0.10) {
+                c.partial++;
             } else {
-                navelExposurePercent = (navelTop - currentWaistLine) / (navelTop - navelBottom);
+                c.not++;
             }
-            let finalNavelVisibility = navelExposurePercent * (1 - currentPalluCoverage);
-            if (fabricTransparency > 0) {
-                finalNavelVisibility = Math.max(finalNavelVisibility, navelExposurePercent * fabricTransparency * (1 - currentPalluCoverage));
-            }
-            let finalHipVisibility = hipExposed ? (1 - currentPalluCoverage) : 0;
-            if (fabricTransparency > 0 && hipExposed) {
-                finalHipVisibility = Math.max(finalHipVisibility, fabricTransparency);
-            }
-            if (finalNavelVisibility >= 0.85) {
-                counters.completely_exposed++;
-            } else if (finalNavelVisibility >= 0.10) {
-                counters.partially_exposed++;
+            const hipV = hipVis >= 0.10;
+            const navV = navelVis >= 0.10;
+            if (hipV && navV) {
+                c.both++;
+            } else if (hipV) {
+                c.hipOnly++;
+            } else if (navV) {
+                c.navelOnly++;
             } else {
-                counters.not_exposed++;
-            }
-            const isHipVisibleState = finalHipVisibility >= 0.10;
-            const isNavelVisibleState = finalNavelVisibility >= 0.10;
-            if (isHipVisibleState && isNavelVisibleState) {
-              counters.hip_and_navel_exposed++;
-            } else if (isHipVisibleState && !isNavelVisibleState) {
-              counters.hip_exposed_navel_hidden++;
-            } else if (!isHipVisibleState && isNavelVisibleState) {
-              counters.completely_exposed++;
-            } else {
-              counters.both_hidden++;
+                c.bothHidden++;
             }
         }
         const endTime = performance.now();
+        const pct = (n) => ((n / iterations) * 100).toFixed(1) + "%";
         return {
             executionTimeMs: (endTime - startTime).toFixed(2),
             totalSamples: iterations,
+            primaryTotal: c.complete + c.partial + c.not,
+            subTotal: c.both + c.hipOnly + c.navelOnly + c.bothHidden,
             results: {
-                complete: ((counters.completely_exposed / iterations) * 100).toFixed(2) + "%",
-                partial: ((counters.partially_exposed / iterations) * 100).toFixed(2) + "%",
-                notExposed: ((counters.not_exposed / iterations) * 100).toFixed(2) + "%"
+                complete: pct(c.complete),
+                partial: pct(c.partial),
+                notExposed: pct(c.not)
             },
             subCases: {
-                bothExposed: ((counters.hip_and_navel_exposed / iterations) * 100).toFixed(2) + "%",
-                hipOnly: ((counters.hip_exposed_navel_hidden / iterations) * 100).toFixed(2) + "%",
-                bothHidden: ((counters.both_hidden / iterations) * 100).toFixed(2) + "%"
+                bothExposed: pct(c.both),
+                hipOnly: pct(c.hipOnly),
+                navelOnly: pct(c.navelOnly),
+                bothHidden: pct(c.bothHidden)
             }
         };
     }
@@ -224,12 +236,14 @@ function executeSimulation() {
     const activity = parseFloat(document.getElementById("activityLevel").value) || 1.0;
     const pleats = parseFloat(document.getElementById("pleatWidth").value) || 5.0;
     const data = engine.runSimulation(drapeStyle, transparency, activity, pleats);
+    console.assert(data.primaryTotal === data.totalSamples && data.subTotal === data.totalSamples);
     document.getElementById("metaInfo").innerText = `Execution Time: ${data.executionTimeMs} ms \n Total Samples Evaluated: ${data.totalSamples.toLocaleString()}`;
     document.getElementById("resComplete").innerText = data.results.complete;
     document.getElementById("resPartial").innerText = data.results.partial;
     document.getElementById("resNot").innerText = data.results.notExposed;
     document.getElementById("subBothExposed").innerText = data.subCases.bothExposed;
     document.getElementById("subHipOnly").innerText = data.subCases.hipOnly;
+    document.getElementById("subNavelOnly").innerText = data.subCases.navelOnly;
     document.getElementById("subBothHidden").innerText = data.subCases.bothHidden;
 }
 </script>
