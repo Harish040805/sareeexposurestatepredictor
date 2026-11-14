@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="naviv.jpg" class="favclass">
     <style>
         :root { --dark: #ff64c6; --medium: #ff41b9; --mediumplus: #ff25af; }
-        body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 27px; display: flex; justify-content: center; }
+        body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: cover; color: #333; margin: 0; padding: 27px; display: flex; justify-content: center; }
         .page { display: flex; flex-direction: column; align-items: center; gap: 25px; width: 100%; }
         .row { display: flex; justify-content: center; width: 100%; }
         .container { max-width: 700px; margin: 0 auto; background: #ffffff43; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(219, 112, 147, 0.15); border: 1px solid #ffe0e6; }
@@ -46,7 +46,7 @@
 <!-- ===================== NAVEL PREDICTOR (existing) ===================== -->
 <div class="row">
 <div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
-    <h2>🦋 Saree Exposure State Predictor 🌷</h2>
+    <h2>🦋 Navel Exposure State Predictor 🌷</h2>
     <img src="naveli.jpg" class="lady-img" id="displayImage">
     <br>
     <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Adjust parameters to run a high-speed mathematical state simulation (100,000 randomized dynamic samples).</p>
@@ -130,11 +130,11 @@
 <!-- ===================== CLEAVAGE PREDICTOR ===================== -->
 <div class="row">
 <div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
-    <h2>🦋 Cleavage Exposure Predictor 🌷</h2>
+    <h2>🦋 Cleavage Exposure State Predictor 🌷</h2>
     <img class="lady-img" id="clvImage" alt="Cleavage state preview" onerror="clvImageMissing()">
     <div id="clvPlaceholder" class="clv-placeholder" style="display:none;"></div>
     <br>
-    <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Uses the Draping Style and Fabric Transparency from the predictor above. Body action, blouse and pallu factors below belong to this predictor only. The image updates automatically; press Run for the probabilities.</p>
+    <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Uses the Draping Style and Fabric Transparency from the predictor above. Body action, blouse and pallu factors below belong to this predictor only. The image changes with the neckline option; press Run for the probabilities.</p>
     <br>
     <div class="form-grid">
         <div class="form-group">
@@ -501,9 +501,9 @@ const CLEAVAGE_IMAGES = {
     slightly: "cleavage_slightly.jpeg",
     not: "cleavage_not.jpeg"
 };
-/* Picture rule: expected exposure score (0–1) below "slightly" → Not image,
-   from "slightly" up to "mostly" → Slightly image, "mostly" and above → Mostly image. */
-const CLEAVAGE_IMAGE_CUTS = { slightly: 0.35, mostly: 0.52 };
+/* Picture follows the Blouse Neckline Depth option only:
+   Shallow -> "not" image, Medium -> "slightly" image, Deep -> "mostly" image. */
+const NECKLINE_IMAGE_KEY = { "Shallow": "not", "Medium": "slightly", "Deep": "mostly" };
 
 function readActivity() {
     const raw = document.getElementById("activityLevel").value;
@@ -564,14 +564,12 @@ function runCleavageModel() {
     const pin = document.getElementById("palluPin").value;
     const data = clvEngine.runSimulation(drapeStyle, transparency, action, neckline, fit, pin);
     console.assert(data.primaryTotal === data.totalSamples);
-    const sc = data.exposureScore;
-    const key = sc >= CLEAVAGE_IMAGE_CUTS.mostly ? "mostly" : (sc >= CLEAVAGE_IMAGE_CUTS.slightly ? "slightly" : "not");
-    return { data, key };
+    return { data };
 }
 
-// Swaps the picture for the overall exposure level (same behaviour as the Draping Style image)
+// Swaps the picture when the neckline option changes (same behaviour as the Draping Style image)
 function updateCleavageImage() {
-    const { key } = runCleavageModel();
+    const key = NECKLINE_IMAGE_KEY[document.getElementById("necklineDepth").value] || "slightly";
     clvCurrentKey = key;
     const img = document.getElementById("clvImage");
     if (clvMissing.has(key)) { showClvPlaceholder(); return; }
@@ -591,15 +589,10 @@ function executeCleavageSimulation() {
     document.getElementById("subPalluOpen").innerText = data.pallu.open;
     document.getElementById("subPalluPartial").innerText = data.pallu.partial;
     document.getElementById("subPalluFull").innerText = data.pallu.full;
-    updateCleavageImage();
 }
 
-// Live image preview: any factor that affects cleavage refreshes the picture
-["drapeStyle", "transparency", "clvAction", "necklineDepth", "blouseFit", "palluPin"].forEach(id => {
-    const el = document.getElementById(id);
-    el.addEventListener("change", updateCleavageImage);
-    el.addEventListener("input", updateCleavageImage);
-});
+// Picture changes only with the neckline option
+document.getElementById("necklineDepth").addEventListener("change", updateCleavageImage);
 updateCleavageImage();
 </script>
 </body>
