@@ -129,15 +129,17 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 class SareeExposureSimulator {
     constructor() {
+        this.navelRadius = 1.0;
+        this.hipTop = -5.0;
+        this.hipBottom = -11.0;
+        this.maxPleatHipCover = 0.25;
+        this.persons = 2000;
+        this.seeThrough = 0.5;
         this.styles = {
-            "Nivi": { avgWaistHeightCm: 1.0, palluCoverageAvg: 0.75, variance: 1.5 },
-            "Low-Hip Contemporary": { avgWaistHeightCm: -7.0, palluCoverageAvg: 0.30, variance: 2.0 },
-            "Bengali / Traditional": { avgWaistHeightCm: 1.0, palluCoverageAvg: 0.95, variance: 0.5 }
+            "Nivi": { edgeMean: -1.0, edgeSd: 2.0, moveSd: 0.4, hemMean: 8.0, hemSd: 3.0, pallu: [0.70, 0.20, 0.10] },
+            "Low-Hip Contemporary": { edgeMean: -6.0, edgeSd: 2.0, moveSd: 0.6, hemMean: 8.0, hemSd: 3.0, pallu: [0.60, 0.30, 0.10] },
+            "Bengali / Traditional": { edgeMean: 0.5, edgeSd: 1.2, moveSd: 0.3, hemMean: 8.0, hemSd: 3.0, pallu: [0.15, 0.30, 0.55] }
         };
-        this.navelTop = 1.5;
-        this.navelBottom = -1.5;
-        this.hipLevel = -5.0;
-        this.pleatShiftPerInch = 0.3;
     }
     createRng(seed) {
         let a = seed >>> 0;
@@ -152,56 +154,76 @@ class SareeExposureSimulator {
     clamp(x, lo, hi) {
         return Math.max(lo, Math.min(hi, x));
     }
+    gauss(rng) {
+        const u = Math.max(rng(), 1e-12);
+        const v = rng();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+    truncNormal(rng, mean, sd) {
+        if (sd <= 0) return mean;
+        let z = this.gauss(rng);
+        while (Math.abs(z) > 2.5) z = this.gauss(rng);
+        return mean + z * sd;
+    }
+    areaAbove(h) {
+        const t = this.clamp(h / this.navelRadius, -1, 1);
+        return (Math.acos(t) - t * Math.sqrt(1 - t * t)) / Math.PI;
+    }
+    layered(D, c, tau) {
+        return D * (1 - c + c * tau) + (1 - D) * (tau * (1 - c) + c * tau * tau);
+    }
     runSimulation(drapeStyle, fabricTransparency = 0.0, activityMultiplier = 1.0, pleatWidth = 5.0, iterations = 100000) {
         const config = this.styles[drapeStyle] || this.styles["Nivi"];
-        const T = this.clamp(fabricTransparency, 0, 1);
+        const T = this.clamp(fabricTransparency, 0, 1) * this.seeThrough;
+        const act = this.clamp(activityMultiplier, 1, 3);
         const pleats = this.clamp(pleatWidth, 2, 6);
+        const pleatCover = this.maxPleatHipCover * (pleats - 2) / 4;
+        const disturbP = Math.min(0.4, 0.08 * (act - 1));
+        const moments = Math.max(1, Math.round(iterations / this.persons));
+        const total = this.persons * moments;
         const rng = this.createRng(12345);
-        const pleatShift = (pleats - 5.0) * this.pleatShiftPerInch;
-        const c = {
-            complete: 0,
-            partial: 0,
-            not: 0,
-            both: 0,
-            hipOnly: 0,
-            navelOnly: 0,
-            bothHidden: 0
-        };
+        const c = { complete: 0, partial: 0, not: 0, both: 0, hipOnly: 0, navelOnly: 0, bothHidden: 0 };
         const startTime = performance.now();
-        for (let i = 0; i < iterations; i++) {
-            const movementFactor = (rng() - 0.5) * config.variance * 2 * activityMultiplier;
-            const waistLine = config.avgWaistHeightCm + movementFactor + pleatShift;
-            const P = this.clamp(config.palluCoverageAvg + (rng() - 0.5) * 0.2, 0, 1);
-            const E = this.clamp((this.navelTop - waistLine) / (this.navelTop - this.navelBottom), 0, 1);
-            const hipExposed = waistLine < this.hipLevel;
-            const navelDirect = E * (1 - P);
-            const navelVis = navelDirect + (1 - navelDirect) * T;
-            const hipDirect = hipExposed ? (1 - P) : 0;
-            const hipVis = hipDirect + (1 - hipDirect) * T;
-            if (navelVis >= 0.85) {
-                c.complete++;
-            } else if (navelVis >= 0.10) {
-                c.partial++;
-            } else {
-                c.not++;
-            }
-            const hipV = hipVis >= 0.10;
-            const navV = navelVis >= 0.10;
-            if (hipV && navV) {
-                c.both++;
-            } else if (hipV) {
-                c.hipOnly++;
-            } else if (navV) {
-                c.navelOnly++;
-            } else {
-                c.bothHidden++;
+        for (let p = 0; p < this.persons; p++) {
+            const edgeBase = this.truncNormal(rng, config.edgeMean, config.edgeSd);
+            const hem = Math.max(0, this.truncNormal(rng, config.hemMean, config.hemSd));
+            const r0 = rng();
+            const baseIdx = r0 < config.pallu[0] ? 0 : (r0 < config.pallu[0] + config.pallu[1] ? 1 : 2);
+            const partialCover = 0.3 + 0.4 * rng();
+            for (let m = 0; m < moments; m++) {
+                const edge = edgeBase + this.truncNormal(rng, 0, config.moveSd * act);
+                let idx = baseIdx;
+                if (idx > 0 && rng() < disturbP) idx--;
+                const cover = idx === 0 ? 0 : (idx === 1 ? partialCover : 1);
+                const D = Math.max(0, this.areaAbove(edge) - this.areaAbove(hem));
+                const Hd = this.clamp((this.hipTop - edge) / (this.hipTop - this.hipBottom), 0, 1) * (1 - pleatCover);
+                const navelVis = this.layered(D, cover, T);
+                const hipVis = this.layered(Hd, cover * 0.5, T);
+                if (navelVis >= 0.85) {
+                    c.complete++;
+                } else if (navelVis >= 0.10) {
+                    c.partial++;
+                } else {
+                    c.not++;
+                }
+                const hipV = hipVis >= 0.10;
+                const navV = navelVis >= 0.10;
+                if (hipV && navV) {
+                    c.both++;
+                } else if (hipV) {
+                    c.hipOnly++;
+                } else if (navV) {
+                    c.navelOnly++;
+                } else {
+                    c.bothHidden++;
+                }
             }
         }
         const endTime = performance.now();
-        const pct = (n) => ((n / iterations) * 100).toFixed(1) + "%";
+        const pct = (n) => ((n / total) * 100).toFixed(1) + "%";
         return {
             executionTimeMs: (endTime - startTime).toFixed(2),
-            totalSamples: iterations,
+            totalSamples: total,
             primaryTotal: c.complete + c.partial + c.not,
             subTotal: c.both + c.hipOnly + c.navelOnly + c.bothHidden,
             results: {
