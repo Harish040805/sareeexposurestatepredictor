@@ -274,7 +274,6 @@
 </div>
 </div>
 </div>
-
 <script>
 if (!confirm("🔞 To enter the site, you should be above 18 years of age. If not return back!")) {
     window.history.back();
@@ -288,7 +287,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 500);
   }, 5000);
 });
-
 const MathKit = {
     createRng(seed) {
         let a = seed >>> 0;
@@ -312,7 +310,6 @@ const MathKit = {
         while (Math.abs(z) > 2.5) z = this.gauss(rng);
         return mean + z * sd;
     },
-    // Truncated normal by rejection on [lo, hi] (no clamping, so no pile-up at the limits)
     truncRange(rng, mean, sd, lo, hi) {
         for (let i = 0; i < 200; i++) {
             const x = mean + sd * this.gauss(rng);
@@ -320,15 +317,9 @@ const MathKit = {
         }
         return this.clamp(mean, lo, hi);
     },
-    // Smooth step used instead of hard cut-offs (removes "cliffs" in the classification)
     soft(x, center, width) { return 1 / (1 + Math.exp(-(x - center) / width)); },
-    // Transparency 0..1 (1.0 = fully sheer). Faint show-through is hard to notice,
-    // so perceived pass-through grows quadratically: 0.2 -> 0.04, 0.5 -> 0.25, 1.0 -> 1.0
     perceivedTau(t) { const x = this.clamp(t, 0, 1); return x * x; }
 };
-
-// ---------- Shared between both predictors ----------
-// ONE pallu table per drape (state: 0 = not covering, 1 = partial, 2 = full)
 const PALLU_BY_STYLE = {
     "Nivi":                  [0.25, 0.50, 0.25],
     "Low-Hip Contemporary":  [0.35, 0.45, 0.20],
@@ -337,10 +328,6 @@ const PALLU_BY_STYLE = {
 const PALLU_SEED = 9001;
 const PERSONS = 2000;
 function partialCoverFrom(r) { return 0.3 + 0.4 * r; }
-
-// Both simulators create this stream and consume it in the same order
-// (person(), then moment() for every moment), so the same simulated person has the
-// same pallu state and the same disturbance draws in both predictors.
 function makePalluStream(drapeStyle) {
     const rng = MathKit.createRng(PALLU_SEED);
     const dist = PALLU_BY_STYLE[drapeStyle] || PALLU_BY_STYLE["Nivi"];
@@ -354,32 +341,25 @@ function makePalluStream(drapeStyle) {
         moment() { return [rng(), rng()]; }
     };
 }
-
-// Soft classification thresholds (centre, width)
 const SOFT = {
     navelComplete: [0.85, 0.04],
     navelVisible:  [0.10, 0.03],
     clvMostly:     [0.60, 0.05],
     clvVisible:    [0.10, 0.03]
 };
-
 class SareeExposureSimulator {
     constructor() {
-        // Units: inches, measured from the centre of the navel zone (positive = up).
-        // navelZoneRadius is the half-height of the exposure window around the navel
-        // (navel plus surrounding skin, ~3 in tall); it is not the anatomical navel size.
         this.navelZoneRadius = 1.5;
         this.hipTop = -5.0;
         this.hipBottom = -11.0;
         this.maxPleatHipCover = 0.25;
-        this.pleatNavelRise = 0.6;     // max upward bulk (in) of the pleat bundle at the navel edge
+        this.pleatNavelRise = 0.6;
         this.persons = PERSONS;
         this.styles = {
             "Nivi": { edgeMean: -1.0, edgeSd: 2.0, moveSd: 0.4, hemMean: 8.0, hemSd: 3.0 },
             "Low-Hip Contemporary": { edgeMean: -6.0, edgeSd: 2.0, moveSd: 0.6, hemMean: 8.0, hemSd: 3.0 },
             "Bengali / Traditional": { edgeMean: 0.5, edgeSd: 1.2, moveSd: 0.3, hemMean: 8.0, hemSd: 3.0 }
         };
-        // How far a chest-pallu state reaches the waist/navel (multiplier on coverage)
         this.navelReach = [0, 0.4, 0.9];
         this.petticoat = {
             "Low":  { edgeShift: -2.0 },
@@ -408,9 +388,6 @@ class SareeExposureSimulator {
             "dancing":  { act: 3.0 },
             "bending":  { bend: true }
         };
-        // Bending uses trigonometry of the forward angle θ:
-        //  s = sin θ (horizontal displacement) drives edge drop, blouse-hem rise and pallu slip
-        //  1 - cos θ (trunk flexion) drives midriff folding
         this.bend = {
             meanAngle: 55, sdAngle: 20, minAngle: 15, maxAngle: 90,
             moveMult: 1.5,
@@ -442,8 +419,8 @@ class SareeExposureSimulator {
         const T = K.perceivedTau(o.transparency);
         const pleats = K.clamp(o.pleatWidth, 2, 6);
         const pleatFrac = (pleats - 2) / 4;
-        const pleatCover = this.maxPleatHipCover * pleatFrac * len.pleat;   // hip coverage
-        const pleatRise = this.pleatNavelRise * pleatFrac * len.pleat;      // navel coverage
+        const pleatCover = this.maxPleatHipCover * pleatFrac * len.pleat;
+        const pleatRise = this.pleatNavelRise * pleatFrac * len.pleat;
         const baseDisturb = ps.disturb !== undefined ? ps.disturb : Math.min(0.4, 0.08 * ((ps.act || 1) - 1));
         const disturbP = Math.min(0.5, baseDisturb * fw.disturb * len.palluDisturb);
         const moments = Math.max(1, Math.round(iterations / this.persons));
@@ -472,7 +449,7 @@ class SareeExposureSimulator {
                     : config.moveSd * ps.act * (ps.moveMult || 1) * fw.move;
                 const drop = isBend ? bd.edgeDrop * s : (ps.edgeDrop || 0);
                 const edge = edgeBase + pleatRise + K.truncNormal(rng, 0, jitterSd) - drop;
-                const hemEff = hem + (isBend ? bd.hemRise * s : 0);   // blouse hem rides up when bending
+                const hemEff = hem + (isBend ? bd.hemRise * s : 0);
                 const pDist = isBend
                     ? Math.min(bd.disturbMax, (bd.disturbBase + bd.disturbSlope * s) * fw.disturb * len.palluDisturb)
                     : disturbP;
@@ -484,8 +461,6 @@ class SareeExposureSimulator {
                 const foldVis = isBend ? 1 - bd.navelFold * flex : (ps.fold ? 1 - ps.fold : 1);
                 const navelVis = this.layered(D, cover, T) * foldVis;
                 const hipVis = this.layered(Hd, cover * 0.5, T);
-
-                // Soft (fractional) classification instead of hard cut-offs
                 const pComplete = K.soft(navelVis, SOFT.navelComplete[0], SOFT.navelComplete[1]);
                 const pNavV = K.soft(navelVis, SOFT.navelVisible[0], SOFT.navelVisible[1]);
                 const pNot = 1 - pNavV;
@@ -522,11 +497,9 @@ class SareeExposureSimulator {
         };
     }
 }
-
 class CleavageSimulator {
     constructor() {
         this.persons = PERSONS;
-        // Base cleavage zone (inches below the shoulder line), shifted by bust size and bra type
         this.baseZoneTop = 3.5;
         this.baseZoneLen = 4.0;
         this.busts = {
@@ -540,15 +513,13 @@ class CleavageSimulator {
             "PushUp":  { top: -0.7, lenAdd: 0.6 },
             "Minimal": { top: -0.2, lenAdd: 0.0 }
         };
-        // How much deeper (inches) a viewer sees into the neckline; grows with forward lean
         this.views = {
             "Front": { depth: 0.0 },
             "Slight": { depth: 0.6 },
             "Above": { depth: 1.5 }
         };
-        this.viewBendGain = 1.5;  // extra multiplier of the view depth at full bend (s = 1)
+        this.viewBendGain = 1.5;
         this.thresholds = { mostly: 0.60, slightly: 0.10 };
-        // Neckline depths now match the zone geometry: a "shallow" neck ends above the zone start (3.5 in)
         this.necklines = {
             "Shallow": { mean: 3.0, sd: 0.8 },
             "Medium":  { mean: 6.5, sd: 1.2 },
@@ -564,7 +535,6 @@ class CleavageSimulator {
             "Standard": { base: 0.08, bendAdd: 0.45 },
             "Loose":    { base: 0.20, bendAdd: 0.65 }
         };
-        // Same activity categories as the navel predictor
         this.postures = {
             "standing": { lean: false, act: 1.0 },
             "sitting":  { lean: true, meanAngle: 10, sdAngle: 8,  minAngle: 0,  maxAngle: 30, moveMult: 0.6 },
@@ -583,7 +553,7 @@ class CleavageSimulator {
         const bust = this.busts[o.bust] || this.busts["Medium"];
         const bra = this.bras[o.bra] || this.bras["Padded"];
         const view = this.views[o.view] || this.views["Front"];
-        const T = K.perceivedTau(o.transparency);   // applied to saree/pallu AND blouse fabric
+        const T = K.perceivedTau(o.transparency);
         const moveMult = ps.lean ? ps.moveMult : ps.act;
         const zoneTop = Math.max(1.5, this.baseZoneTop + bust.top + bra.top);
         const zoneLen = Math.max(1.5, bust.len + bra.lenAdd);
@@ -604,12 +574,11 @@ class CleavageSimulator {
                 if (ps.lean) {
                     const ang = K.truncRange(rng, ps.meanAngle, ps.sdAngle, ps.minAngle, ps.maxAngle);
                     angleSum += ang;
-                    s = Math.sin(ang * Math.PI / 180);   // forward displacement of blouse and viewer line of sight
+                    s = Math.sin(ang * Math.PI / 180);
                 }
                 const viewDepth = view.depth * (0.5 + this.viewBendGain * s);
                 const neckEff = neckBase + K.truncNormal(rng, 0, fit.moveSd * moveMult) + fit.gape * s + viewDepth;
                 const reveal = K.clamp((neckEff - zoneTop) / zoneLen, 0, 1);
-
                 let idx = pl.baseIdx;
                 if (ps.lean) {
                     const pDist = Math.min(this.slipMax, pin.base + pin.bendAdd * s);
@@ -621,10 +590,8 @@ class CleavageSimulator {
                 }
                 pal[idx]++;
                 const cover = idx === 0 ? 0 : (idx === 1 ? pl.partialCover : 1);
-                // Skin seen = open neckline + skin seen through the blouse fabric; pallu then layers on top
                 const skinSeen = reveal + (1 - reveal) * T;
                 const vis = skinSeen * (1 - cover + cover * T);
-
                 const pMostly = K.soft(vis, SOFT.clvMostly[0], SOFT.clvMostly[1]);
                 const pVisible = K.soft(vis, SOFT.clvVisible[0], SOFT.clvVisible[1]);
                 const pNot = 1 - pVisible;
@@ -648,7 +615,6 @@ class CleavageSimulator {
         };
     }
 }
-
 const engine = new SareeExposureSimulator();
 const clvEngine = new CleavageSimulator();
 const CLEAVAGE_IMAGES = {
@@ -656,9 +622,7 @@ const CLEAVAGE_IMAGES = {
     slightly: "cleavage_slightly.jpeg",
     not: "cleavage_not.jpeg"
 };
-
 const NECKLINE_IMAGE_KEY = { "Shallow": "not", "Medium": "slightly", "Deep": "mostly" };
-
 function updateImage() {
     const drapeStyle = document.getElementById("drapeStyle").value;
     const imgElement = document.getElementById("displayImage");
@@ -670,8 +634,6 @@ function updateImage() {
         imgElement.src = "navelii.jpg";
     }
 }
-
-// Shows, inside the cleavage panel, which settings it inherits from the navel panel
 function updateInherited() {
     const drapeStyle = document.getElementById("drapeStyle").value;
     const t = parseFloat(document.getElementById("transparency").value);
@@ -680,7 +642,6 @@ function updateInherited() {
         "Inherited from the predictor above → Draping Style: " + drapeStyle +
         " | Fabric Transparency: " + tr.toFixed(1);
 }
-
 function executeSimulation() {
     const parsedT = parseFloat(document.getElementById("transparency").value);
     const parsedP = parseFloat(document.getElementById("pleatWidth").value);
@@ -706,10 +667,8 @@ function executeSimulation() {
     document.getElementById("subNavelOnly").innerText = data.subCases.navelOnly;
     document.getElementById("subBothHidden").innerText = data.subCases.bothHidden;
 }
-
 let clvCurrentKey = null;
 const clvMissing = new Set();
-
 function clvImageMissing() {
     if (clvCurrentKey) clvMissing.add(clvCurrentKey);
     showClvPlaceholder();
@@ -720,7 +679,6 @@ function showClvPlaceholder() {
     ph.style.display = "flex";
     ph.innerText = "Add image: " + (clvCurrentKey ? CLEAVAGE_IMAGES[clvCurrentKey] : "");
 }
-
 function runCleavageModel() {
     const parsedT = parseFloat(document.getElementById("transparency").value);
     const data = clvEngine.runSimulation({
@@ -737,7 +695,6 @@ function runCleavageModel() {
     console.assert(Math.abs(data.primaryTotal - data.totalSamples) < 1e-6);
     return { data };
 }
-
 function updateCleavageImage() {
     const key = NECKLINE_IMAGE_KEY[document.getElementById("necklineDepth").value] || "slightly";
     clvCurrentKey = key;
@@ -747,7 +704,6 @@ function updateCleavageImage() {
     img.style.display = "block";
     img.src = CLEAVAGE_IMAGES[key];
 }
-
 function executeCleavageSimulation() {
     updateInherited();
     const { data } = runCleavageModel();
@@ -764,6 +720,21 @@ function executeCleavageSimulation() {
 document.getElementById("necklineDepth").addEventListener("change", updateCleavageImage);
 updateCleavageImage();
 updateInherited();
+function score(o){
+  const base={drapeStyle:"Nivi",transparency:0,posture:"standing",pleatWidth:5,
+    petticoat:"Mid",bodyType:"Average",sareeLength:"Standard",fabricWeight:"Medium"};
+  const r=engine.runSimulation({...base,...o},20000).results;
+  return parseFloat(r.complete)+0.5*parseFloat(r.partial);
+}
+const checks=[
+ ["Low petticoat ≥ Mid ≥ High", score({petticoat:"Low"})>=score({petticoat:"Mid"}) && score({petticoat:"Mid"})>=score({petticoat:"High"})],
+ ["More transparency ≥ exposure", score({transparency:0.8})>=score({transparency:0})],
+ ["Wider pleats ≤ exposure", score({pleatWidth:6})<=score({pleatWidth:2})],
+ ["Light fabric ≥ Heavy (when walking)", score({fabricWeight:"Light",posture:"walking"})>=score({fabricWeight:"Heavy",posture:"walking"})],
+ ["Short-waisted ≤ Long-waisted", score({bodyType:"Short"})<=score({bodyType:"Long"})],
+ ["Never exactly 0 or 100", score({petticoat:"High",pleatWidth:6,drapeStyle:"Bengali / Traditional"})>0 && score({petticoat:"Low",drapeStyle:"Low-Hip Contemporary"})<100]
+];
+checks.forEach(([n,ok])=>console.log(ok?"PASS":"FAIL",n));
 </script>
 </body>
 </html>
