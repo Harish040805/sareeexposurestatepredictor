@@ -20,12 +20,12 @@
     h2 { font-size: 19px; line-height: 1.25; }
     h3 { font-size: 17px; }
     .panel-body { display: flex; gap: 14px; flex: 1; min-height: 0; }
-    .media { flex: 0 0 38%; display: flex; flex-direction: column; gap: 8px; }
-    .lady-img, .clv-placeholder { flex: 1 1 auto; width: 100%; min-height: 260px; border: 1px solid #ffb6c1; border-radius: 20px; }
-    .lady-img { object-fit: cover; display: block; }
+    .media { flex: 0 0 38%; position: relative; min-height: 240px; }
+    .lady-img, .clv-placeholder { position: absolute; inset: 0; width: 100%; height: 100%; border: 1px solid #ffb6c1; border-radius: 20px; }
+    .lady-img { object-fit: fill; display: block; }
     .clv-placeholder { border-style: dashed; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; color: #a05070; padding: 10px; }
-    .inherit-box { font-size: 13.5px; background: #fff0f3; border-left: 4px solid var(--medium); border-radius: 4px; padding: 6px 10px; margin: 0; }
-    .form-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; align-content: space-between; }
+    .inherit-box { align-self: end; font-size: 14px; background: #fff0f3; border-left: 4px solid var(--medium); border-radius: 4px; padding: 6px 10px; margin: 0; }
+    .form-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; align-content: start; align-items: start; }
     .form-group { margin: 0; }
     label { display: block; font-weight: 600; font-size: 14px; line-height: 1.25; margin-bottom: 4px; color: var(--dark); }
     select, input { width: 100%; padding: 8px 8px; border: 1px solid #ffb6c1; border-radius: 6px; font-size: 14.5px; background: #fff; }
@@ -54,8 +54,7 @@
     }
     @media (max-width: 700px) {
         .panel-body { flex-direction: column; }
-        .media { flex: none; }
-        .lady-img, .clv-placeholder { flex: none; height: 240px; min-height: 0; }
+        .media { flex: none; height: 240px; min-height: 0; }
     }
     @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
 </style>
@@ -179,7 +178,6 @@
         <div class="media">
             <img class="lady-img" id="clvImage" alt="Cleavage state preview" onerror="clvImageMissing()">
             <div id="clvPlaceholder" class="clv-placeholder" style="display:none;"></div>
-            <div class="inherit-box" id="clvInherited"></div>
         </div>
         <div class="form-grid">
             <div class="form-group">
@@ -241,6 +239,7 @@
                     <option value="Above">From above (looking down)</option>
                 </select>
             </div>
+            <div class="inherit-box" id="clvInherited"></div>
         </div>
     </div>
 </div>
