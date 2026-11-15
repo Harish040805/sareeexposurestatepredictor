@@ -7,42 +7,57 @@
     <link rel="icon" type="image/x-icon" href="naviv.jpg" class="favclass">
 <style>
     :root { --dark: #ff64c6; --medium: #ff41b9; --mediumplus: #ff25af; }
-    body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 10px; display: flex; justify-content: center; }
-    .page { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: 1500px; }
-    .row { display: flex; justify-content: center; align-items: stretch; gap: 10px; width: 100%; }
-    .container { margin: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; background: #ffffff43; padding: 10px 14px; border-radius: 12px; box-shadow: 0 4px 15px rgba(219, 112, 147, 0.15); border: 1px solid #ffe0e6; }
-    .container.left { flex: 1.35 1 0; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; font-size: 15px; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 10px; display: flex; justify-content: center; }
+    .page { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 1700px; }
+    .row { display: flex; align-items: stretch; gap: 10px; width: 100%; }
+    .container { display: flex; flex-direction: column; gap: 10px; background: #ffffff43; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(219, 112, 147, 0.15); border: 1px solid #ffe0e6; }
+    .container.left { flex: 1.6 1 0; }
     .container.right { flex: 1 1 0; }
-    .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .head-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .head h2 { flex: 1; min-width: 0; }
     h2, h3 { color: var(--medium); margin: 0; }
-    h2 { font-size: 16px; line-height: 1.25; }
-    h3 { font-size: 14px; margin-top: 2px; }
-    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 10px; }
+    h2 { font-size: 19px; line-height: 1.25; }
+    h3 { font-size: 17px; }
+    .panel-body { display: flex; gap: 14px; flex: 1; min-height: 0; }
+    .media { flex: 0 0 38%; display: flex; flex-direction: column; gap: 8px; }
+    .lady-img, .clv-placeholder { flex: 1 1 auto; width: 100%; min-height: 260px; border: 1px solid #ffb6c1; border-radius: 20px; }
+    .lady-img { object-fit: cover; display: block; }
+    .clv-placeholder { border-style: dashed; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; color: #a05070; padding: 10px; }
+    .inherit-box { font-size: 13.5px; background: #fff0f3; border-left: 4px solid var(--medium); border-radius: 4px; padding: 6px 10px; margin: 0; }
+    .form-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; align-content: space-between; }
     .form-group { margin: 0; }
-    label { display: block; font-weight: 600; font-size: 12px; line-height: 1.2; margin-bottom: 3px; color: var(--dark); }
-    select, input { width: 100%; padding: 5px 6px; border: 1px solid #ffb6c1; border-radius: 6px; box-sizing: border-box; font-size: 12.5px; }
+    label { display: block; font-weight: 600; font-size: 14px; line-height: 1.25; margin-bottom: 4px; color: var(--dark); }
+    select, input { width: 100%; padding: 8px 8px; border: 1px solid #ffb6c1; border-radius: 6px; font-size: 14.5px; background: #fff; }
     select:focus, input:focus { outline: none; border-color: var(--medium); box-shadow: 0 0 5px rgba(219, 112, 147, 0.3); }
     button { cursor: pointer; border: none; transition: background 0.2s; }
-    .run-btn { flex: none; width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--medium); color: #fff; font-size: 15px; line-height: 1; box-shadow: 0 2px 6px rgba(255, 65, 185, 0.4); }
+    .run-btn { flex: none; width: 42px; height: 42px; padding: 0; border-radius: 50%; background-color: var(--medium); color: #fff; font-size: 17px; line-height: 1; box-shadow: 0 2px 6px rgba(255, 65, 185, 0.4); }
     .run-btn:hover { background-color: var(--mediumplus); }
-    .info-btn { flex: none; width: 24px; height: 24px; padding: 0; border-radius: 50%; background: #fff0f3; font-size: 14px; line-height: 1; cursor: help; }
+    .info-btn { flex: none; width: 28px; height: 28px; padding: 0; border-radius: 50%; background: #fff0f3; font-size: 16px; line-height: 1; cursor: help; }
     .info-btn:hover { background: #ffd6e6; }
-    .meta-info { font-size: 11px; line-height: 1.3; color: #777; text-align: right; white-space: pre-line; margin: 0; }
-    table { width: 100%; border-collapse: collapse; background: #fff; table-layout: fixed; }
-    th, td { border: 1px solid #ffe0e6; padding: 4px 6px; font-size: 12px; text-align: center; vertical-align: middle; }
-    th { background-color: var(--medium); color: white; }
-    tr > th:first-child { width: 20%; text-align: left; }
-    td { font-weight: 600; }
-    .lady-img { width: 200px; height: 150px; object-fit: fill; display: block; margin: 0 auto; border: 1px solid #ffb6c1; border-radius: 24px; }
-    .clv-placeholder { width: 200px; height: 150px; margin: 0 auto; border: 1px dashed #ffb6c1; border-radius: 24px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; color: #a05070; padding: 10px; box-sizing: border-box; }
-    .inherit-box { font-size: 12px; background: #fff0f3; border-left: 4px solid var(--medium); border-radius: 4px; padding: 4px 8px; margin: 0; }
+    .meta-info { font-size: 13px; line-height: 1.35; color: #666; text-align: right; white-space: pre-line; margin: 0; }
+    .tbl { flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+    .tbl table { flex: 1; }
+    table { width: 100%; height: 100%; border-collapse: collapse; background: #fff; table-layout: fixed; }
+    th, td { border: 1px solid #ffe0e6; padding: 6px 10px; font-size: 15px; vertical-align: middle; }
+    th { background-color: var(--medium); color: white; text-align: center; }
+    tbody th { text-align: left; width: 62%; }
+    td { text-align: center; font-weight: 700; font-size: 17px; }
     #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
     #splash-img { max-width: 70%; max-height: 70%; object-fit: contain; border-radius: 1000px; }
     #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .favclass { border-radius: 200px; }
-    @media (max-width: 900px) { .row { flex-direction: column; align-items: center; } .container { width: 100%; } .container.left, .container.right { flex: none; } }
-    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 1000px) {
+        .row { flex-direction: column; }
+        .container.left, .container.right { flex: none; width: 100%; }
+        .tbl { flex: none; }
+    }
+    @media (max-width: 700px) {
+        .panel-body { flex-direction: column; }
+        .media { flex: none; }
+        .lady-img, .clv-placeholder { flex: none; height: 240px; min-height: 0; }
+    }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -58,65 +73,69 @@
         <h2>🦋 Navel Exposure State Predictor 🌷</h2>
         <button class="info-btn" type="button" aria-label="Note" title="📌 NOTE: Adjust parameters to run a high-speed mathematical state simulation (100,000 randomized dynamic samples).">ℹ️</button>
     </div>
-    <img src="naveli.jpg" class="lady-img" id="displayImage">
-    <div class="form-grid">
-        <div class="form-group">
-            <label for="drapeStyle">Draping Style:</label>
-            <select id="drapeStyle" onchange="updateImage(); updateInherited();">
-                <option value="Nivi">Nivi (Standard / Traditional)</option>
-                <option value="Low-Hip Contemporary">Low-Hip Contemporary</option>
-                <option value="Bengali / Traditional">Bengali / Traditional</option>
-            </select>
+    <div class="panel-body">
+        <div class="media">
+            <img src="naveli.jpg" class="lady-img" id="displayImage">
         </div>
-        <div class="form-group">
-            <label for="activityLevel">Activity Level Factor:</label>
-            <select id="activityLevel">
-                <option value="standing">Static (Standing)</option>
-                <option value="sitting">Static (Sitting – midriff folds)</option>
-                <option value="walking">Moderate (Normal Walking)</option>
-                <option value="dancing">Dynamic (Active Dancing / Movement)</option>
-                <option value="bending">Bending / Bowing Down (15°–90° forward bend)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="petticoat">Petticoat Tying Height:</label>
-            <select id="petticoat">
-                <option value="Low">Low (tied well below navel)</option>
-                <option value="Mid" selected>Medium (around navel level)</option>
-                <option value="High">High (tied above navel)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="transparency">Fabric Transparency Factor (0.0 = Opaque, 1.0 = Fully Sheer):</label>
-            <input type="number" id="transparency" min="0" max="1" step="0.1" value="0.0" oninput="updateInherited()">
-        </div>
-        <div class="form-group">
-            <label for="pleatWidth">Pleat Folding Width Factor (in inches):</label>
-            <input type="number" id="pleatWidth" min="2" max="6" step="0.5" value="5.0">
-        </div>
-        <div class="form-group">
-            <label for="bodyType">Body Proportions (Torso):</label>
-            <select id="bodyType">
-                <option value="Short">Short-waisted (blouse hem close to navel)</option>
-                <option value="Average" selected>Average</option>
-                <option value="Long">Long-waisted (blouse hem far from navel)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="sareeLength">Saree Length:</label>
-            <select id="sareeLength">
-                <option value="Short">Short (~5 m, less fabric for pleats / pallu)</option>
-                <option value="Standard" selected>Standard (~5.5–6.5 m)</option>
-                <option value="Long">Long (9-yard / extra fabric)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="fabricWeight">Fabric Weight:</label>
-            <select id="fabricWeight">
-                <option value="Light">Light (chiffon / georgette – shifts easily)</option>
-                <option value="Medium" selected>Medium (cotton / crepe)</option>
-                <option value="Heavy">Heavy (silk / brocade – stays in place)</option>
-            </select>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="drapeStyle">Draping Style:</label>
+                <select id="drapeStyle" onchange="updateImage(); updateInherited();">
+                    <option value="Nivi">Nivi (Standard / Traditional)</option>
+                    <option value="Low-Hip Contemporary">Low-Hip Contemporary</option>
+                    <option value="Bengali / Traditional">Bengali / Traditional</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="activityLevel">Activity Level Factor:</label>
+                <select id="activityLevel">
+                    <option value="standing">Static (Standing)</option>
+                    <option value="sitting">Static (Sitting – midriff folds)</option>
+                    <option value="walking">Moderate (Normal Walking)</option>
+                    <option value="dancing">Dynamic (Active Dancing / Movement)</option>
+                    <option value="bending">Bending / Bowing Down (15°–90° forward bend)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="petticoat">Petticoat Tying Height:</label>
+                <select id="petticoat">
+                    <option value="Low">Low (tied well below navel)</option>
+                    <option value="Mid" selected>Medium (around navel level)</option>
+                    <option value="High">High (tied above navel)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transparency">Fabric Transparency Factor (0.0 = Opaque, 1.0 = Fully Sheer):</label>
+                <input type="number" id="transparency" min="0" max="1" step="0.1" value="0.0" oninput="updateInherited()">
+            </div>
+            <div class="form-group">
+                <label for="pleatWidth">Pleat Folding Width Factor (in inches):</label>
+                <input type="number" id="pleatWidth" min="2" max="6" step="0.5" value="5.0">
+            </div>
+            <div class="form-group">
+                <label for="bodyType">Body Proportions (Torso):</label>
+                <select id="bodyType">
+                    <option value="Short">Short-waisted (blouse hem close to navel)</option>
+                    <option value="Average" selected>Average</option>
+                    <option value="Long">Long-waisted (blouse hem far from navel)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sareeLength">Saree Length:</label>
+                <select id="sareeLength">
+                    <option value="Short">Short (~5 m, less fabric for pleats / pallu)</option>
+                    <option value="Standard" selected>Standard (~5.5–6.5 m)</option>
+                    <option value="Long">Long (9-yard / extra fabric)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fabricWeight">Fabric Weight:</label>
+                <select id="fabricWeight">
+                    <option value="Light">Light (chiffon / georgette – shifts easily)</option>
+                    <option value="Medium" selected>Medium (cotton / crepe)</option>
+                    <option value="Heavy">Heavy (silk / brocade – stays in place)</option>
+                </select>
+            </div>
         </div>
     </div>
 </div>
@@ -126,15 +145,28 @@
         <div class="meta-info" id="metaInfo">Results appear here</div>
         <button class="run-btn" type="button" title="▶️ Run Simulation Engine" aria-label="Run Simulation Engine" onclick="executeSimulation()">▶️</button>
     </div>
-    <table>
-        <tr><th>Anatomical Navel State</th><th>Completely Exposed</th><th>Partially Exposed</th><th>Not Exposed</th></tr>
-        <tr><th>Probability Distribution</th><td id="resComplete">--</td><td id="resPartial">--</td><td id="resNot">--</td></tr>
-    </table>
+    <div class="tbl">
+        <table>
+            <thead><tr><th>Anatomical Navel State</th><th>Probability</th></tr></thead>
+            <tbody>
+                <tr><th>Completely Exposed</th><td id="resComplete">--</td></tr>
+                <tr><th>Partially Exposed</th><td id="resPartial">--</td></tr>
+                <tr><th>Not Exposed</th><td id="resNot">--</td></tr>
+            </tbody>
+        </table>
+    </div>
     <h3>💞 Sub-Case Regional Matrices</h3>
-    <table>
-        <tr><th>Structural Combination Condition</th><th>Hip Exposed AND Navel Exposed</th><th>Hip Exposed BUT Navel Not Exposed</th><th>Navel Exposed BUT Hip Not Exposed</th><th>Both Hip and Navel Hidden</th></tr>
-        <tr><th>Probability Distribution</th><td id="subBothExposed">--</td><td id="subHipOnly">--</td><td id="subNavelOnly">--</td><td id="subBothHidden">--</td></tr>
-    </table>
+    <div class="tbl">
+        <table>
+            <thead><tr><th>Structural Combination Condition</th><th>Probability</th></tr></thead>
+            <tbody>
+                <tr><th>Hip Exposed AND Navel Exposed</th><td id="subBothExposed">--</td></tr>
+                <tr><th>Hip Exposed BUT Navel Not Exposed</th><td id="subHipOnly">--</td></tr>
+                <tr><th>Navel Exposed BUT Hip Not Exposed</th><td id="subNavelOnly">--</td></tr>
+                <tr><th>Both Hip and Navel Hidden</th><td id="subBothHidden">--</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </div>
 <div class="row">
@@ -143,68 +175,72 @@
         <h2>🦋 Cleavage Exposure State Predictor 🌷</h2>
         <button class="info-btn" type="button" aria-label="Note" title="📌 NOTE: Uses the Draping Style and Fabric Transparency set in the predictor above (shown below). Body action, blouse, bust, bra, viewing angle and pallu factors belong to this predictor only. The pallu state of each simulated person is shared with the navel predictor. The image changes with the neckline option; press Run for the probabilities.">ℹ️</button>
     </div>
-    <img class="lady-img" id="clvImage" alt="Cleavage state preview" onerror="clvImageMissing()">
-    <div id="clvPlaceholder" class="clv-placeholder" style="display:none;"></div>
-    <div class="inherit-box" id="clvInherited"></div>
-    <div class="form-grid">
-        <div class="form-group">
-            <label for="necklineDepth">Blouse Neckline Depth:</label>
-            <select id="necklineDepth">
-                <option value="Shallow">Shallow (high / boat neck, ~3 in)</option>
-                <option value="Medium" selected>Medium (round / U neck, ~6.5 in)</option>
-                <option value="Deep">Deep (V / plunging, ~9 in)</option>
-            </select>
+    <div class="panel-body">
+        <div class="media">
+            <img class="lady-img" id="clvImage" alt="Cleavage state preview" onerror="clvImageMissing()">
+            <div id="clvPlaceholder" class="clv-placeholder" style="display:none;"></div>
+            <div class="inherit-box" id="clvInherited"></div>
         </div>
-        <div class="form-group">
-            <label for="clvAction">Activity Level Factor:</label>
-            <select id="clvAction">
-                <option value="standing">Static (Standing)</option>
-                <option value="sitting">Static (Sitting / Slight Lean)</option>
-                <option value="walking">Moderate (Normal Walking)</option>
-                <option value="dancing">Dynamic (Active Dancing / Movement)</option>
-                <option value="bending">Bending / Bowing Down (15°–90° forward bend)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="blouseFit">Blouse Fit:</label>
-            <select id="blouseFit">
-                <option value="Snug">Snug (tailored, stays close)</option>
-                <option value="Standard" selected>Standard</option>
-                <option value="Loose">Loose (gapes when leaning)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="palluPin">Pallu Security (Chest Pallu):</label>
-            <select id="palluPin">
-                <option value="Pinned">Pinned / Fixed to blouse</option>
-                <option value="Standard" selected>Standard (draped over shoulder)</option>
-                <option value="Loose">Loose / Free-flowing</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="bustSize">Bust Size:</label>
-            <select id="bustSize">
-                <option value="Small">Small</option>
-                <option value="Medium" selected>Medium</option>
-                <option value="Large">Large</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="braType">Bra Type:</label>
-            <select id="braType">
-                <option value="Full">Full-coverage</option>
-                <option value="Padded" selected>Padded / T-shirt</option>
-                <option value="PushUp">Push-up / Plunge</option>
-                <option value="Minimal">Minimal / Bralette</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="viewAngle">Viewing Angle:</label>
-            <select id="viewAngle">
-                <option value="Front" selected>Front (eye level)</option>
-                <option value="Slight">Slightly from above</option>
-                <option value="Above">From above (looking down)</option>
-            </select>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="necklineDepth">Blouse Neckline Depth:</label>
+                <select id="necklineDepth">
+                    <option value="Shallow">Shallow (high / boat neck, ~3 in)</option>
+                    <option value="Medium" selected>Medium (round / U neck, ~6.5 in)</option>
+                    <option value="Deep">Deep (V / plunging, ~9 in)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="clvAction">Activity Level Factor:</label>
+                <select id="clvAction">
+                    <option value="standing">Static (Standing)</option>
+                    <option value="sitting">Static (Sitting / Slight Lean)</option>
+                    <option value="walking">Moderate (Normal Walking)</option>
+                    <option value="dancing">Dynamic (Active Dancing / Movement)</option>
+                    <option value="bending">Bending / Bowing Down (15°–90° forward bend)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="blouseFit">Blouse Fit:</label>
+                <select id="blouseFit">
+                    <option value="Snug">Snug (tailored, stays close)</option>
+                    <option value="Standard" selected>Standard</option>
+                    <option value="Loose">Loose (gapes when leaning)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="palluPin">Pallu Security (Chest Pallu):</label>
+                <select id="palluPin">
+                    <option value="Pinned">Pinned / Fixed to blouse</option>
+                    <option value="Standard" selected>Standard (draped over shoulder)</option>
+                    <option value="Loose">Loose / Free-flowing</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="bustSize">Bust Size:</label>
+                <select id="bustSize">
+                    <option value="Small">Small</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Large">Large</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="braType">Bra Type:</label>
+                <select id="braType">
+                    <option value="Full">Full-coverage</option>
+                    <option value="Padded" selected>Padded / T-shirt</option>
+                    <option value="PushUp">Push-up / Plunge</option>
+                    <option value="Minimal">Minimal / Bralette</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="viewAngle">Viewing Angle:</label>
+                <select id="viewAngle">
+                    <option value="Front" selected>Front (eye level)</option>
+                    <option value="Slight">Slightly from above</option>
+                    <option value="Above">From above (looking down)</option>
+                </select>
+            </div>
         </div>
     </div>
 </div>
@@ -214,15 +250,27 @@
         <div class="meta-info" id="clvMeta">Results appear here</div>
         <button class="run-btn" type="button" title="▶️ Run Simulation Engine" aria-label="Run Simulation Engine" onclick="executeCleavageSimulation()">▶️</button>
     </div>
-    <table>
-        <tr><th>Anatomical Cleavage State</th><th id="rowMostly">Mostly Exposed</th><th id="rowSlightly">Slightly Exposed</th><th id="rowNot">Not Exposed</th></tr>
-        <tr><th>Probability Distribution</th><td id="clvMostly">--</td><td id="clvSlightly">--</td><td id="clvNot">--</td></tr>
-    </table>
+    <div class="tbl">
+        <table>
+            <thead><tr><th>Anatomical Cleavage State</th><th>Probability</th></tr></thead>
+            <tbody>
+                <tr><th id="rowMostly">Mostly Exposed</th><td id="clvMostly">--</td></tr>
+                <tr><th id="rowSlightly">Slightly Exposed</th><td id="clvSlightly">--</td></tr>
+                <tr><th id="rowNot">Not Exposed</th><td id="clvNot">--</td></tr>
+            </tbody>
+        </table>
+    </div>
     <h3>💞 Sub-Case Pallu Matrices</h3>
-    <table>
-        <tr><th>Chest Pallu State (after movement)</th><th>Pallu Not Covering Chest</th><th>Pallu Partially Covering Chest</th><th>Pallu Fully Covering Chest</th></tr>
-        <tr><th>Probability Distribution</th><td id="subPalluOpen">--</td><td id="subPalluPartial">--</td><td id="subPalluFull">--</td></tr>
-    </table>
+    <div class="tbl">
+        <table>
+            <thead><tr><th>Chest Pallu State (after movement)</th><th>Probability</th></tr></thead>
+            <tbody>
+                <tr><th>Pallu Not Covering Chest</th><td id="subPalluOpen">--</td></tr>
+                <tr><th>Pallu Partially Covering Chest</th><td id="subPalluPartial">--</td></tr>
+                <tr><th>Pallu Fully Covering Chest</th><td id="subPalluFull">--</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </div>
 </div>
