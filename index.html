@@ -5,34 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saree Exposure State Predictor</title>
     <link rel="icon" type="image/x-icon" href="naviv.jpg" class="favclass">
-    <style>
-        :root { --dark: #ff64c6; --medium: #ff41b9; --mediumplus: #ff25af; }
-        body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 27px; display: flex; justify-content: center; }
-        .page { display: flex; flex-direction: column; align-items: center; gap: 25px; width: 100%; }
-        .row { display: flex; justify-content: center; width: 100%; }
-        .container { max-width: 700px; margin: 0 auto; background: #ffffff43; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(219, 112, 147, 0.15); border: 1px solid #ffe0e6; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        h2, h3 { color: var(--medium); margin-top: 0; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--dark); }
-        select, input { width: 100%; padding: 10px; border: 1px solid #ffb6c1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        select:focus, input:focus { outline: none; border-color: var(--medium); box-shadow: 0 0 5px rgba(219, 112, 147, 0.3); }
-        button { width: 100%; background-color: var(--medium); color: white; border: none; padding: 10px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-        button:hover { background-color: var(--mediumplus); }
-        .results-panel { margin-top: 25px; padding: 15px; background-color: #fff0f3; border-left: 5px solid var(--medium); border-radius: 4px; }
-        .meta-info { font-size: 12px; color: #777; margin-bottom: 15px; text-align: right; }
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; background: #fff; }
-        th, td { border: 1px solid #ffe0e6; padding: 10px; text-align: left; }
-        th { background-color: var(--medium); color: white; }
-        .lady-img{ width: 285px; height: 257px; align-content: center; display: block; margin: 0 auto; border: 1px solid #ffb6c1; border-radius: 30px; }
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
-        #splash-img { max-width: 70%; max-height: 70%; object-fit: contain; border-radius: 1000px; }
-        #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        .favclass { border-radius: 200px; }
-        .clv-placeholder { width: 285px; height: 257px; margin: 0 auto; border: 1px dashed #ffb6c1; border-radius: 30px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 13px; color: #a05070; padding: 15px; box-sizing: border-box; }
-        .inherit-box { font-size: 13px; background: #fff0f3; border-left: 4px solid var(--medium); border-radius: 4px; padding: 8px 10px; margin: 6px 0; }
-        @media (max-width: 900px) { .row { flex-direction: column; align-items: center; gap: 25px; } .container { width: 100%; box-sizing: border-box; } .form-grid { grid-template-columns: 1fr; } }
-    </style>
+<style>
+    :root { --dark: #ff64c6; --medium: #ff41b9; --mediumplus: #ff25af; }
+    body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background-image: url('https://github.com/Harish040805/sareeexposurestatepredictor/blob/main/navel.jpg?raw=true'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: contain; color: #333; margin: 0; padding: 10px; display: flex; justify-content: center; }
+    .page { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: 1500px; }
+    .row { display: flex; justify-content: center; align-items: stretch; gap: 10px; width: 100%; }
+    .container { margin: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; background: #ffffff43; padding: 10px 14px; border-radius: 12px; box-shadow: 0 4px 15px rgba(219, 112, 147, 0.15); border: 1px solid #ffe0e6; }
+    .container.left { flex: 1.35 1 0; }
+    .container.right { flex: 1 1 0; }
+    .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .head-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    h2, h3 { color: var(--medium); margin: 0; }
+    h2 { font-size: 16px; line-height: 1.25; }
+    h3 { font-size: 14px; margin-top: 2px; }
+    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 10px; }
+    .form-group { margin: 0; }
+    label { display: block; font-weight: 600; font-size: 12px; line-height: 1.2; margin-bottom: 3px; color: var(--dark); }
+    select, input { width: 100%; padding: 5px 6px; border: 1px solid #ffb6c1; border-radius: 6px; box-sizing: border-box; font-size: 12.5px; }
+    select:focus, input:focus { outline: none; border-color: var(--medium); box-shadow: 0 0 5px rgba(219, 112, 147, 0.3); }
+    button { cursor: pointer; border: none; transition: background 0.2s; }
+    .run-btn { flex: none; width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--medium); color: #fff; font-size: 15px; line-height: 1; box-shadow: 0 2px 6px rgba(255, 65, 185, 0.4); }
+    .run-btn:hover { background-color: var(--mediumplus); }
+    .info-btn { flex: none; width: 24px; height: 24px; padding: 0; border-radius: 50%; background: #fff0f3; font-size: 14px; line-height: 1; cursor: help; }
+    .info-btn:hover { background: #ffd6e6; }
+    .meta-info { font-size: 11px; line-height: 1.3; color: #777; text-align: right; white-space: pre-line; margin: 0; }
+    table { width: 100%; border-collapse: collapse; background: #fff; table-layout: fixed; }
+    th, td { border: 1px solid #ffe0e6; padding: 4px 6px; font-size: 12px; text-align: center; vertical-align: middle; }
+    th { background-color: var(--medium); color: white; }
+    tr > th:first-child { width: 20%; text-align: left; }
+    td { font-weight: 600; }
+    .lady-img { width: 200px; height: 150px; object-fit: cover; display: block; margin: 0 auto; border: 1px solid #ffb6c1; border-radius: 24px; }
+    .clv-placeholder { width: 200px; height: 150px; margin: 0 auto; border: 1px dashed #ffb6c1; border-radius: 24px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; color: #a05070; padding: 10px; box-sizing: border-box; }
+    .inherit-box { font-size: 12px; background: #fff0f3; border-left: 4px solid var(--medium); border-radius: 4px; padding: 4px 8px; margin: 0; }
+    #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
+    #splash-img { max-width: 70%; max-height: 70%; object-fit: contain; border-radius: 1000px; }
+    #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .favclass { border-radius: 200px; }
+    @media (max-width: 900px) { .row { flex-direction: column; align-items: center; } .container { width: 100%; } .container.left, .container.right { flex: none; } }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+</style>
 </head>
 <body>
 <div id="splash-screen">
@@ -42,12 +53,12 @@
 </div>
 <div class="page">
 <div class="row">
-<div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
-    <h2>🦋 Navel Exposure State Predictor 🌷</h2>
+<div class="container left">
+    <div class="head">
+        <h2>🦋 Navel Exposure State Predictor 🌷</h2>
+        <button class="info-btn" type="button" aria-label="Note" title="📌 NOTE: Adjust parameters to run a high-speed mathematical state simulation (100,000 randomized dynamic samples).">ℹ️</button>
+    </div>
     <img src="naveli.jpg" class="lady-img" id="displayImage">
-    <br>
-    <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Adjust parameters to run a high-speed mathematical state simulation (100,000 randomized dynamic samples).</p>
-    <br>
     <div class="form-grid">
         <div class="form-group">
             <label for="drapeStyle">Draping Style:</label>
@@ -68,20 +79,20 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="transparency">Fabric Transparency Factor <br>(0.0 = Opaque, 1.0 = Fully Sheer):</label>
-            <input type="number" id="transparency" min="0" max="1" step="0.1" value="0.0" oninput="updateInherited()">
-        </div>
-        <div class="form-group">
-            <label for="pleatWidth">Pleat Folding Width Factor <br>(in inches):</label>
-            <input type="number" id="pleatWidth" min="2" max="6" step="0.5" value="5.0">
-        </div>
-        <div class="form-group">
             <label for="petticoat">Petticoat Tying Height:</label>
             <select id="petticoat">
                 <option value="Low">Low (tied well below navel)</option>
                 <option value="Mid" selected>Medium (around navel level)</option>
                 <option value="High">High (tied above navel)</option>
             </select>
+        </div>
+        <div class="form-group">
+            <label for="transparency">Fabric Transparency Factor (0.0 = Opaque, 1.0 = Fully Sheer):</label>
+            <input type="number" id="transparency" min="0" max="1" step="0.1" value="0.0" oninput="updateInherited()">
+        </div>
+        <div class="form-group">
+            <label for="pleatWidth">Pleat Folding Width Factor (in inches):</label>
+            <input type="number" id="pleatWidth" min="2" max="6" step="0.5" value="5.0">
         </div>
         <div class="form-group">
             <label for="bodyType">Body Proportions (Torso):</label>
@@ -109,62 +120,32 @@
         </div>
     </div>
 </div>
-<div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-top: 0; padding-bottom: 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; margin-top: 0;">
-        <h2 style="margin-top: 20px; font-size: 20px;">💋 Primary Navel Exposure 🔞
-            <br>
-            <span style="color: #ffffff00;">_____</span>Categorization
-        </h2>
-        <div class="meta-info" id="metaInfo" style="margin: 0;">
-            Results appear here
-            <span style="color: #ffffff0f;">oo</span>
-            <br>
-            <span style="color: #ffffff0f;">oo</span>
-        </div>
+<div class="container right">
+    <div class="head">
+        <h2>💋 Primary Navel Exposure 🔞 Categorization</h2>
+        <div class="meta-info" id="metaInfo">Results appear here</div>
+        <button class="run-btn" type="button" title="▶️ Run Simulation Engine" aria-label="Run Simulation Engine" onclick="executeSimulation()">▶️</button>
     </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Anatomical Navel State</th>
-                    <th>Probability Distribution</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Completely Exposed</td><td id="resComplete">--</td></tr>
-                <tr><td>Partially Exposed</td><td id="resPartial">--</td></tr>
-                <tr><td>Not Exposed</td><td id="resNot">--</td></tr>
-            </tbody>
-        </table>
-        <br>
-        <h3>💞 Sub-Case Regional Matrices</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Structural Combination Condition</th>
-                    <th>Probability Distribution</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Hip Exposed AND Navel Exposed</td><td id="subBothExposed">--</td></tr>
-                <tr><td>Hip Exposed BUT Navel Not Exposed</td><td id="subHipOnly">--</td></tr>
-                <tr><td>Navel Exposed BUT Hip Not Exposed</td><td id="subNavelOnly">--</td></tr>
-                <tr><td>Both Hip and Navel Hidden</td><td id="subBothHidden">--</td></tr>
-            </tbody>
-        </table>
-        <br>
-    <button onclick="executeSimulation()">▶️ &nbsp; Run Simulation Engine</button>
-    <br>
+    <table>
+        <tr><th>Anatomical Navel State</th><th>Completely Exposed</th><th>Partially Exposed</th><th>Not Exposed</th></tr>
+        <tr><th>Probability Distribution</th><td id="resComplete">--</td><td id="resPartial">--</td><td id="resNot">--</td></tr>
+    </table>
+    <h3>💞 Sub-Case Regional Matrices</h3>
+    <table>
+        <tr><th>Structural Combination Condition</th><th>Hip Exposed AND Navel Exposed</th><th>Hip Exposed BUT Navel Not Exposed</th><th>Navel Exposed BUT Hip Not Exposed</th><th>Both Hip and Navel Hidden</th></tr>
+        <tr><th>Probability Distribution</th><td id="subBothExposed">--</td><td id="subHipOnly">--</td><td id="subNavelOnly">--</td><td id="subBothHidden">--</td></tr>
+    </table>
 </div>
 </div>
 <div class="row">
-<div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-bottom: 0;">
-    <h2>🦋 Cleavage Exposure State Predictor 🌷</h2>
+<div class="container left">
+    <div class="head">
+        <h2>🦋 Cleavage Exposure State Predictor 🌷</h2>
+        <button class="info-btn" type="button" aria-label="Note" title="📌 NOTE: Uses the Draping Style and Fabric Transparency set in the predictor above (shown below). Body action, blouse, bust, bra, viewing angle and pallu factors belong to this predictor only. The pallu state of each simulated person is shared with the navel predictor. The image changes with the neckline option; press Run for the probabilities.">ℹ️</button>
+    </div>
     <img class="lady-img" id="clvImage" alt="Cleavage state preview" onerror="clvImageMissing()">
     <div id="clvPlaceholder" class="clv-placeholder" style="display:none;"></div>
-    <br>
-    <p style="margin-top: 3px; margin-bottom: 3px;"><b>📌 NOTE:</b>&nbsp; Uses the Draping Style and Fabric Transparency set in the predictor above (shown below). Body action, blouse, bust, bra, viewing angle and pallu factors belong to this predictor only. The pallu state of each simulated person is shared with the navel predictor. The image changes with the neckline option; press Run for the probabilities.</p>
     <div class="inherit-box" id="clvInherited"></div>
-    <br>
     <div class="form-grid">
         <div class="form-group">
             <label for="necklineDepth">Blouse Neckline Depth:</label>
@@ -227,50 +208,21 @@
         </div>
     </div>
 </div>
-<div class="container" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; padding-top: 0; padding-bottom: 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; margin-top: 0;">
-        <h2 style="margin-top: 20px; font-size: 20px;">💋 Primary Cleavage Exposure 🔞
-            <br>
-            <span style="color: #ffffff00;">_____</span>Categorization
-        </h2>
-        <div class="meta-info" id="clvMeta" style="margin: 0;">
-            Results appear here
-            <span style="color: #ffffff0f;">oo</span>
-            <br>
-            <span style="color: #ffffff0f;">oo</span>
-        </div>
+<div class="container right">
+    <div class="head">
+        <h2>💋 Primary Cleavage Exposure 🔞 Categorization</h2>
+        <div class="meta-info" id="clvMeta">Results appear here</div>
+        <button class="run-btn" type="button" title="▶️ Run Simulation Engine" aria-label="Run Simulation Engine" onclick="executeCleavageSimulation()">▶️</button>
     </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Anatomical Cleavage State</th>
-                    <th>Probability Distribution</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="rowMostly"><td>Mostly Exposed</td><td id="clvMostly">--</td></tr>
-                <tr id="rowSlightly"><td>Slightly Exposed</td><td id="clvSlightly">--</td></tr>
-                <tr id="rowNot"><td>Not Exposed</td><td id="clvNot">--</td></tr>
-            </tbody>
-        </table>
-        <br>
-        <h3>💞 Sub-Case Pallu Matrices</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Chest Pallu State (after movement)</th>
-                    <th>Probability Distribution</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Pallu Not Covering Chest</td><td id="subPalluOpen">--</td></tr>
-                <tr><td>Pallu Partially Covering Chest</td><td id="subPalluPartial">--</td></tr>
-                <tr><td>Pallu Fully Covering Chest</td><td id="subPalluFull">--</td></tr>
-            </tbody>
-        </table>
-        <br>
-    <button onclick="executeCleavageSimulation()">▶️ &nbsp; Run Simulation Engine</button>
-    <br>
+    <table>
+        <tr><th>Anatomical Cleavage State</th><th id="rowMostly">Mostly Exposed</th><th id="rowSlightly">Slightly Exposed</th><th id="rowNot">Not Exposed</th></tr>
+        <tr><th>Probability Distribution</th><td id="clvMostly">--</td><td id="clvSlightly">--</td><td id="clvNot">--</td></tr>
+    </table>
+    <h3>💞 Sub-Case Pallu Matrices</h3>
+    <table>
+        <tr><th>Chest Pallu State (after movement)</th><th>Pallu Not Covering Chest</th><th>Pallu Partially Covering Chest</th><th>Pallu Fully Covering Chest</th></tr>
+        <tr><th>Probability Distribution</th><td id="subPalluOpen">--</td><td id="subPalluPartial">--</td><td id="subPalluFull">--</td></tr>
+    </table>
 </div>
 </div>
 </div>
